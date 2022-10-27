@@ -1,0 +1,8 @@
+(14) Build the route for placing orders
+(15) Build the route for getting orders on a vendor's account and the order status
+(16) Build the route for getting orders on a customer's account dashboard
+(17) Build the route for getting a vendor's wallet balance
+(19) Build the route for getting all the products uploaded by the logged in user
+(21) Create route for getting all reviews of a single product
+(23) Create route for editing a product review
+(24) Create route for deleting a product review

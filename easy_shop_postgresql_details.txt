@@ -1,0 +1,11 @@
+Master username
+Gabby95
+
+Master password
+Aeronautica#95
+
+Database Name
+easyshop_database
+
+Endpoint
+easyshop-instance.cbhwzg6vvhhq.us-east-1.rds.amazonaws.com
