@@ -6,7 +6,7 @@ const addBankAccount = async (req, res) => {
      // Check for errors in body request
      const errors = validationResult(req);
      if (!errors.isEmpty()) {
-         return res.status(400).json({ errors: errors.isArray() });
+         return res.status(400).json({ errors: errors.array() });
      }
      // Destructure parameter from the request body
      const { bankname, accountname, accountiban, cardnumber } = req.body;
@@ -52,7 +52,7 @@ const editBankAccount = async (req, res) => {
     // Check for errors in body request
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.isArray() });
+        return res.status(400).json({ errors: errors.array() });
     }
     // Destructure parameter from the request body
     const { bankname, accountname, accountiban, cardnumber } = req.body;
