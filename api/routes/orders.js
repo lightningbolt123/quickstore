@@ -23,7 +23,7 @@ router.post('/', [
 // @Route   PUT api/orders/id/item_id
 // @Desc    Route for updating order status
 // @Access  Private
-router.put('/id/item_id', [
+router.put('/:id/:item_id', [
     auth,
     body('newstatus','The new status cannot be empty').not().isEmpty()
 ], orderControllers.updateOrderStatus);

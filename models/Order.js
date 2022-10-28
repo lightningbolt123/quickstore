@@ -14,6 +14,10 @@ const OrderSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    customerphone: {
+        type: String,
+        required: true
+    },
     goodspurchased: [
         {
             productid: {

@@ -76,8 +76,8 @@ const placeOrder = async (req, res) => {
         const reference = uuidv4();
         // Process card payment
         const cardIsValid = cards.filter(card => card.cardnumber === cardnumber);
-        const cvvIsValid = cards.filter(card => card.cardnumber === cardnumber && card.cvv === cvv);
-        const cardExpiryDateIsValid = cards.filter(card => card.cardnumber === cardnumber && card.cvv === cvv && cardnumber.expirydate === expirydate);
+        const cvvIsValid = cardIsValid.filter(card => card.cvv === cvv);
+        const cardExpiryDateIsValid = cvvIsValid.filter(card => card.expirydate === expirydate);
         // Check if card number is valid
         if (cardIsValid.length === 0) {
             return res.status(400).json({
@@ -121,9 +121,9 @@ const placeOrder = async (req, res) => {
         for (i=0; i<items.length; i++) {
             // Fetch vendor wallet balance
             const wallet = await pool.query('SELECT * FROM wallet WHERE store_id=$1',[items[i].storeid]);
-            const ledger_balance = parseFloat(wallet.ledger_balance).toFixed(2) + parseFloat(items[i].cost).toFixed(2);
+            const ledger_balance = wallet.rows[0].ledger_balance + parseFloat(items[i].cost)
             // Update the vendors wallet balance for each item purchased
-            await pool.query('UPDATE wallet SET ledger_balance=$1 WHERE store_id=$2', [ledger_balance, items[i].storeid]);
+            await pool.query('UPDATE wallet SET ledger_balance=$1 WHERE store_id=$2', [ledger_balance, parseInt(items[i].storeid)]);
         }
         
         // Create new order
@@ -131,12 +131,13 @@ const placeOrder = async (req, res) => {
             customerid: req.user.id,
             customerfirstname: firstname,
             customerlastname: lastname,
+            customerphone: phone,
             goodspurchased: items
         });
         await order.save();
         // Return success response
         return res.status(200).json({
-            msg: 'Your purchase was successful and your order is being processed at the moment. You have to confirm that you have received your good while it is been handed over to you to completet your transaction. Thank you for using quickstore.',
+            msg: 'Your purchase was successful and your order is being processed at the moment. You have to confirm that you have received your good while it is been handed over to you to complete your transaction. Thank you for using quickstore.',
             status: 'success',
             status_code: '200'
         });
@@ -182,38 +183,59 @@ const updateOrderStatus = async (req, res) => {
                 status_code: '404'
             });
         }
+        if (newstatus !== 'received' || newstatus !== 'cancelled' || newstatus !== 'processing') {
+            return res.status(400).json({
+                msg: 'Wrong purchase status detected.',
+                status: 'bad request',
+                status_code: '400'
+            })
+        }
+        // Get order object
+        const orderObject = order.goodspurchased.find(item => item._id.toString() === item_id);
         // Update order status
-        order.items.map(item => item._id === item_id ? item.status = newstatus : item);
+        order.goodspurchased.map(item => item._id.toString() === item_id ? item.status = newstatus : item);
         // Save order
         await order.save();
         // Get the vendor wallet
-        const wallet = await pool.query('SELECT * FROM wallet WHERE user_id=$1',[order.user.toString()]);
+        const wallet = await pool.query('SELECT * FROM wallet WHERE store_id=$1',[orderObject.storeid]);
         // Check status
-        if (newstatus === 'received') {
+        if (newstatus === 'received' && orderObject.status !== 'received') {
             // Create new available balance and ledger balance
-            const availableBalance = parseFloat(wallet.available_balance).toFixed(2) + parseFloat(order.total_amount_paid).toFixed(2);
-            const ledgerBalance = parseFloat(wallet.ledger_balance).toFixed(2) - parseFloat(order.total_amount_paid).toFixed(2);
+            const availableBalance = wallet.rows[0].available_balance + parseFloat(orderObject.cost);
+            const ledgerBalance = wallet.rows[0].ledger_balance - parseFloat(orderObject.cost);
             // Update the vendor wallet balance
-            await pool.query('UPDATE wallet SET available_balance=$1, ledger_balance=$2 WHERE user_id=$3', [availableBalance, ledgerBalance, order.user.toString()]);
+            await pool.query('UPDATE wallet SET available_balance=$1, ledger_balance=$2 WHERE store_id=$3', [availableBalance, ledgerBalance, orderObject.storeid]);
             return res.status(200).json({
                 msg: 'You have successfully confirmed the receival of this product.',
                 status: 'success',
                 status_code: '200'
             });
-        } else if (newstatus === 'cancelled') {
+        } else if (newstatus === 'cancelled' && orderObject.status !== 'cancelled') {
+            let goods;
+            if (order.goodspurchased.length > 1) {
+                goods = 'items';
+            } else {
+                goods = 'item';
+            }
             // Create new ledger balance
-            const ledgerBalance = parseFloat(wallet.ledger_balance).toFixed(2) - parseFloat(order.total_amount_paid).toFixed(2);
+            const ledgerBalance = wallet.rows[0].ledger_balance - parseFloat(orderObject.cost);
             // Update the vendor wallet balance
-            await pool.query('UPDATE wallet SET ledger_balance=$1 WHERE user_id=$2', [ledgerBalance, order.user.toString()]);
+            await pool.query('UPDATE wallet SET ledger_balance=$1 WHERE store_id=$2', [ledgerBalance, orderObject.storeid]);
             // Send notification sms to the customer that their purchase has been cancelled and their funds have refunded to their account
             await client.messages.create({
-                body: `Hi ${order.customer_firstname} ${order.customer_lastname}, Your order for the purchase of ${order.good_purchased} has been cancelled and your funds are been processed. Thank you once more for using quickstore.`,
+                body: `Hi ${order.customerfirstname} ${order.customerlastname}, your order for the purchase of ${order.goodspurchased.length} ${goods} has been cancelled and your funds are been processed. Thank you once more for using quickstore.`,
                 from: '+12075033646',
-                to: order.customer_phone
+                to: `${order.customerphone}`
             });
             // Return success response
             return res.status(200).json({
                 msg: 'Your have successfully cancelled this order and your funds are been processed.',
+                status: 'success',
+                status_code: '200'
+            });
+        } else if (orderObject.status !== 'received' || orderObject.status !== 'cancelled') {
+            return res.status(200).json({
+                msg: 'You have already confirmed this order.',
                 status: 'success',
                 status_code: '200'
             });
@@ -244,7 +266,7 @@ const getOrders = async (req, res) => {
             });
         }
         // Get vendor store
-        const store = await pool.query('SELECT * FROM store WHERE user_id=$1',[req.user.id]);
+        const store = await pool.query('SELECT * FROM store WHERE seller_id=$1',[req.user.id]);
         // Get all the orders belonging to the logged in vendor
         const orders = await Order.find({ items: { $elemMatch: { storeid: store.rows[0].store_id } } });
         // Check if the orders array is empty or not
@@ -326,7 +348,7 @@ const userIsVendor = async (req, res) => {
             });
         }
         // Fetch the store of the logged in user
-        const store = await pool.query('SELECT * FROM store WHERE user_id=$1',[req.user.id]);
+        const store = await pool.query('SELECT * FROM store WHERE seller_id=$1',[req.user.id]);
         //Check if the store exists
         if (store.rows.length > 0) {
             return res.status(200).json({
