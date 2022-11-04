@@ -66,18 +66,26 @@ router.post('/', [
         // Check if user with the email address exists
         if (emailExists) {
             return res.status(401).json({
-                msg: 'User with this email address already exists on our system, please try signing up with another email address.',
-                status: 'unauthorized',
-                status_code: '401'
+                errors: [
+                    {
+                        msg: 'User with this email address already exists on our system, please try signing up with another email address.',
+                        status: 'unauthorized',
+                        status_code: '401'
+                    }
+                ]
             });
         }
 
         // Check if user with the phone number exists
         if (phonenumberExists) {
             return res.status(401).json({
-                msg: 'User with this phone number already exists, please try signing up with another phone number.',
-                status: 'unauthorized',
-                status_code: '401'
+                errors: [
+                    {
+                        msg: 'User with this phone number already exists, please try signing up with another phone number.',
+                        status: 'unauthorized',
+                        status_code: '401'
+                    }
+                ]
             });
         }
 
@@ -122,9 +130,13 @@ router.post('/', [
             if (error) {
                 // Return error if the OTP fails to deliver
                 return res.status(503).json({
-                    msg: 'We were unable to send you an OTP due to an error we encountered. Please try to register again later, thank you.',
-                    status: 'service unavailable',
-                    status_code: '503'
+                    errors: [
+                        {
+                            msg: 'We were unable to send you an OTP due to an error we encountered. Please try to register again later, thank you.',
+                            status: 'service unavailable',
+                            status_code: '503'
+                        }
+                    ]
                 });
             }
         }
@@ -132,9 +144,13 @@ router.post('/', [
         if (error) {
             // Return error if the server encounters an error while creating or fetching user account details
             return res.status(503).json({
-                msg: 'We encountered an error while we were trying to create your account. Please try again later, thank you.',
-                status: 'service unavailable',
-                status_code: '503'
+                errors: [
+                    {
+                        msg: 'We encountered an error while we were trying to create your account. Please try again later, thank you.',
+                        status: 'service unavailable',
+                        status_code: '503'
+                    }
+                ]
             });
         }
     }
@@ -159,39 +175,37 @@ router.post('/verifyaccount', [
         // Check if user with the phone number exists
         if (!user) {
             return res.status(404).json({
-                msg: 'You don\'t have an account with us. Signup and start using our features.',
-                status: 'not found',
-                status_code: '404'
+                errors: [
+                    {
+                        msg: 'You don\'t have an account with us. Signup and start using our features.',
+                        status: 'not found',
+                        status_code: '404'
+                    }
+                ]
             });
         }
         try {
              // Send verification code to the user's phone number
-            const verification = await otpCheck(countrycode, phonenumber, otp);
-
-            // CHeck if verification was approved
-            if (verification.status === 'approved') {
-                user = await User.findOneAndUpdate({ countrycode: parseInt(countrycode), phonenumber: parseInt(phonenumber) }, { active: true }, { new: true });
-                // Return success response
-                return res.status(200).json({
-                    msg: 'Your account has been activated successfully. You can now login and start making use of our features.',
-                    status: 'activation successful',
-                    status_code: '200'
-                });
-            } else {
-                // Return error response
-                return res.status(200).json({ 
-                    msg: 'We were unable to activate your account because we were unable to verify the otp you sent, please try again later. Thank you.',
-                    status: 'activation failed',
-                    status_code: '200'
-                });
-            }
+            await otpCheck(countrycode, phonenumber, otp);
+            // Activate user account
+            await User.findOneAndUpdate({ countrycode: parseInt(countrycode), phonenumber: parseInt(phonenumber) }, { active: true }, { new: true });
+            // Return success response
+            return res.status(200).json({
+                msg: 'Your account has been activated successfully. You can now login and start making use of our features.',
+                status: 'activation successful',
+                status_code: '200'
+            });
         } catch (error) {
             if (error) {
                 console.log(error.message);
                 return res.status(503).json({
-                    msg: 'We encountered an error while we were trying to verify the otp you sent. Please resend the otp and try again later, thank you.',
-                    status: 'service unavailable',
-                    status_code: '503'
+                    errors: [
+                        {
+                            msg: 'We encountered an error while we were trying to verify the otp you sent. Please resend the otp and try again later, thank you.',
+                            status: 'service unavailable',
+                            status_code: '503'
+                        }
+                    ]
                 });
             }
         }
@@ -199,9 +213,13 @@ router.post('/verifyaccount', [
         if (error) {
             console.log(error);
             return res.status(503).json({
-                msg: 'We encountered an error while we were trying to retrieve your account details. Please try again later, thank you.',
-                status: 'service unavailable',
-                status_code: '503'
+                errors: [
+                    {
+                        msg: 'We encountered an error while we were trying to retrieve your account details. Please try again later, thank you.',
+                        status: 'service unavailable',
+                        status_code: '503'
+                    }
+                ]
             });
         }
     }
@@ -235,9 +253,13 @@ router.post('/resend_otp', [
         // return error if the sms service fails with an error
         if (error) {
             return res.status(503).json({
-                msg: 'We are unable to resend your otp at the moment. Please try again later, thank you.',
-                status: 'service unavailable',
-                status_code: '503'
+                errors: [
+                    {
+                        msg: 'We are unable to resend your otp at the moment. Please try again later, thank you.',
+                        status: 'service unavailable',
+                        status_code: '503'
+                    }
+                ]
             });
         }
     }
@@ -336,9 +358,13 @@ router.post('/generatetoken', [
         // Check if the user exists and return an error if the user does not exist
         if (!user) {
             return res.status(404).json({
-                msg: 'Account with this phonenumber does not exist on our platform. Please try another phone number or signup for a new account.',
-                status: 'not found',
-                status_code: '404'
+                errors: [
+                    {
+                        msg: 'Account with this phonenumber does not exist on our platform. Please try another phone number or signup for a new account.',
+                        status: 'not found',
+                        status_code: '404'
+                    }
+                ]
             });
         }
 
@@ -359,42 +385,62 @@ router.post('/generatetoken', [
                     // Return error if the server encounters an error while generating the token
                     if (error) {
                         return res.status(500).json({
-                            msg: 'We encountered an error while trying to generate token. Please try again later.',
-                            status: 'server error',
-                            status_code: '500'
-                        })
+                            errors: [
+                                {
+                                    msg: 'We encountered an error while trying to generate token. Please try again later.',
+                                    status: 'server error',
+                                    status_code: '500'
+                                }
+                            ]
+                        });
                     }
                     // Return token
                     return res.status(200).json({
-                        status: 'token.success',
-                        status_code: '200',
-                        data: token
-                    })
+                        errors: [
+                            {
+                                status: 'token.success',
+                                status_code: '200',
+                                data: token
+                            }
+                        ]
+                    });
                 });
             } else {
                 return res.status(200).json({
-                    msg: 'We were unable to verify the otp you sent. Please try resending the otp and try again, thank you.',
-                    status: 'token.failed',
-                    status_code: '200'
-                })
+                    errors: [
+                        {
+                            msg: 'We were unable to verify the otp you sent. Please try resending the otp and try again, thank you.',
+                            status: 'token.failed',
+                            status_code: '200'
+                        }
+                    ]
+                });
             }
         } catch (error) {
             // Return error if the token verification service failed
             if (error) {
                 return res.status(503).json({
-                    msg: 'We encountered an error while trying to verify your otp. Please try again later.',
-                    status: 'service unavailable',
-                    status_code: '503'
-                })
+                    errors: [
+                        {
+                            msg: 'We encountered an error while trying to verify your otp. Please try again later.',
+                            status: 'service unavailable',
+                            status_code: '503'
+                        }
+                    ]
+                });
             }
         }
     } catch (error) {
         // Check for error while fetching user id
         if (error) {
             return res.status(503).json({
-                msg: 'Sorry we are unable to generate a token for your password retrieval at the moment. Please try again later, thank you.',
-                status: 'service unavailable',
-                status_code: '503'
+                errors: [
+                    {
+                        msg: 'Sorry we are unable to generate a token for your password retrieval at the moment. Please try again later, thank you.',
+                        status: 'service unavailable',
+                        status_code: '503'
+                    }
+                ]
             });
         }
     }

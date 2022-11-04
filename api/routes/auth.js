@@ -90,10 +90,10 @@ router.post('/', [
             try {
                 const verification = await smsVerification(parseInt(user.countrycode), parseInt(user.phonenumber));
                 if (verification.status === 'pending') {
-                    res.status(200).json({
+                    res.status(201).json({
                         msg: 'Your account is inactive so we sent you an otp to your phone for activating your account.',
-                        status: 'success',
-                        status_code: '200',
+                        status: 'created',
+                        status_code: '201',
                         data: {
                             countrycode: user.countrycode,
                             phonenumber: user.phonenumber
