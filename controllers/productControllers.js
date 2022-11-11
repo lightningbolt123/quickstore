@@ -49,7 +49,7 @@ const createProduct = async (req, res) => {
         }
         // Check if the product features array was included in the request body and update the product_features object
         if (features) {
-            product_features = features.split(',').map(feature => feature.trim());
+            product_features = features.map(feature => feature.trim());
         } else {
             product_features = [];
         }
@@ -74,6 +74,7 @@ const createProduct = async (req, res) => {
     } catch (error) {
         // Return error message if the remote services are unavailable
         if (error) {
+            console.log(error.message);
             return res.status(503).json({
                 msg: 'We are unable to upload your product image at the moment. Please try again later, thank you.',
                 status: 'service unavailable',
