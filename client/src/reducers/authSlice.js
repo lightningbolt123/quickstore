@@ -17,7 +17,7 @@ export const loginUser = createAsyncThunk(
 // Function for loading user data
 export const loadUser = createAsyncThunk(
     "auth/loadUserStatus",
-    async (_, { rejectWithValue}) => {
+    async (_, { rejectWithValue }) => {
         try {
             const response = await authAPI.loadUser();
             return response.data;

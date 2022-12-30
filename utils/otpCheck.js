@@ -3,9 +3,9 @@ const authToken = process.env.TWILIO_AUTH_TOKEN;
 const serviceId = process.env.TWILIO_SERViCE_ID;
 const client = require('twilio')(accountSid, authToken);
 
-module.exports = async function (countrycode, phonenumber, otp) {
+module.exports = async function (phonenumber, otp) {
     const verification = await client.verify.v2.services(serviceId)
                                         .verificationChecks
-                                        .create({to: `+${countrycode}${phonenumber}`, code: otp });
+                                        .create({ to: phonenumber, code: otp });
     return verification;
 }

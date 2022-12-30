@@ -7,7 +7,7 @@ const fetchProducts = async () => {
 }
 
 const fetchProduct = async (id) => {
-    return axios.get(`http://localhost:5000/api/store/products/all/${id}`);
+    return axios.get(`http://localhost:5000/api/store/products/all/${id}`, headerConfig);
 }
 
 export const productAPI = {

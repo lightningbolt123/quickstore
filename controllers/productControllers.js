@@ -196,6 +196,12 @@ const getProductById = async (req, res) => {
     try {
         // Fetch product details
         const product = await pool.query('SELECT * FROM product WHERE id=$1', [req.params.id]);
+        const data = product.rows[0];
+        const discount = (product.rows[0].product_discount / 100) * product.rows[0].product_price;
+        if (data.product_discount !== null || data.product_discount > 0) {
+            const new_price = product.rows[0].product_price - discount;
+            data.new_price = new_price;
+        }
         // Check if product exists on the database
         if (product.rows.length === 0) {
             return res.status(404).json({
@@ -208,7 +214,7 @@ const getProductById = async (req, res) => {
             return res.status(200).json({
                 status: 'success',
                 status_code: '200',
-                data: product.rows[0]
+                data
             });
         }
     } catch (error) {

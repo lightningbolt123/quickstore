@@ -30,8 +30,7 @@ router.post('/', [
     check('city','City cannot be empty.').not().isEmpty(),
     check('postalcode','Postalcode only takes in numeric values.').isNumeric().isLength({ min:3 }),
     check('country','Country cannot be empty.').not().isEmpty(),
-    check('countrycode','Country code must be of numeric value.').isNumeric().isLength({ min:1 }),
-    check('phonenumber','Phone number must be a numeric value.').isNumeric().isLength({ min:8 })
+    check('phonenumber','Phone number cannot be empty.').not().isEmpty()
 ], async (req, res) => {
     const errors = validationResult(req);
 
@@ -52,7 +51,6 @@ router.post('/', [
         city,
         postalcode,
         country,
-        countrycode,
         phonenumber
     } = req.body;
     try {
@@ -61,7 +59,7 @@ router.post('/', [
         const emailExists = await User.findOne({ email });
 
         // Get user account with that phone number
-        const phonenumberExists = await User.findOne({ countrycode: parseInt(countrycode), phonenumber: parseInt(phonenumber) });
+        const phonenumberExists = await User.findOne({ phonenumber });
 
         // Check if user with the email address exists
         if (emailExists) {
@@ -100,13 +98,12 @@ router.post('/', [
             city,
             postalcode,
             country,
-            countrycode,
             phonenumber
         });
 
         try {
             // Send OTP to the user's phone number for completing registration
-            const verification = await smsVerification(countrycode, phonenumber);
+            const verification = await smsVerification(phonenumber);
 
             // Check the status of the verification service
             if (verification.status === 'pending') {
@@ -118,10 +115,7 @@ router.post('/', [
                 await user.save();
                 return res.status(200).json({
                     msg: 'Your account has been created successfully but there is one more step to complete your registration before your account can be acctive. Check your phone for the OTP we sent to you to complete your signup process.',
-                    data: {
-                        countrycode,
-                        phonenumber
-                    },
+                    data: phonenumber,
                     status: 'processing request',
                     status_code: '200'
                 });
@@ -161,16 +155,15 @@ router.post('/', [
 // @Access  Public
 router.post('/verifyaccount', [
     check('otp','The otp must be of numerical value.').isNumeric().isLength({ min:6 }),
-    check('countrycode','The country code cannot be empty be empty.').isNumeric().isLength({ min:1 }),
-    check('phonenumber','The phone number cannot be empty be empty.').isNumeric().isLength({ min:8 })
+    check('phonenumber','The phone number cannot be empty be empty.').not().isEmpty()
 ], async (req, res) => {
     const error = validationResult(req);
     if (!error.isEmpty()) {
         return res.status(400).json(error);
     }
-    const { otp, countrycode, phonenumber } = req.body;
+    const { otp, phonenumber } = req.body;
     try {
-        let user = await User.findOne({ countrycode: parseInt(countrycode), phonenumber: parseInt(phonenumber) });
+        let user = await User.findOne({ phonenumber });
 
         // Check if user with the phone number exists
         if (!user) {
@@ -186,9 +179,9 @@ router.post('/verifyaccount', [
         }
         try {
              // Send verification code to the user's phone number
-            await otpCheck(countrycode, phonenumber, otp);
+            await otpCheck(phonenumber, otp);
             // Activate user account
-            await User.findOneAndUpdate({ countrycode: parseInt(countrycode), phonenumber: parseInt(phonenumber) }, { active: true }, { new: true });
+            await User.findOneAndUpdate({ phonenumber }, { active: true }, { new: true });
             // Return success response
             return res.status(200).json({
                 msg: 'Your account has been activated successfully. You can now login and start making use of our features.',
