@@ -46,13 +46,13 @@ const Product = () => {
     return (
         <div className='product-box'>
             <div style={{ marginLeft: '0px', marginRight: '10px' }}>
-                {product.product_images && <img src={product.product_images[pictureIndex].secure_url} className='product-image' />}<br />
+                {product.product_images && <img src={product.product_images[pictureIndex].secure_url} alt='product image' className='product-image' />}<br />
                 <div>
-                    <FontAwesomeIcon style={{  marginBottom: '35px' }} className='direction-icon-style' onClick={(e) => slideBackward(e)} icon={faChevronLeft} size='2x' />
+                    <FontAwesomeIcon style={{  marginBottom: '35px' }} className='icon-style' onClick={(e) => slideBackward(e)} icon={faChevronLeft} size='2x' />
                     {product.product_images && product.product_images.slice(start, end).map(image => (
-                        <img key={image.public_id} src={image.secure_url} className='image-thumbnail' style={{ marginRight: '10px' }} onClick={(e) => setPictureInFrame(e, image.public_id)} />
+                        <img key={image.public_id} src={image.secure_url} className='image-thumbnail' alt='product thumbnail' style={{ marginRight: '10px' }} onClick={(e) => setPictureInFrame(e, image.public_id)} />
                     ))}
-                    <FontAwesomeIcon style={{  marginBottom: '35px' }}  className='direction-icon-style' onClick={(e) => slideForward(e)} icon={faChevronRight} size='2x' />
+                    <FontAwesomeIcon style={{  marginBottom: '35px' }}  className='icon-style' onClick={(e) => slideForward(e)} icon={faChevronRight} size='2x' />
                 </div>
             </div>
             <div className='product-content'>

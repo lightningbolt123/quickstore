@@ -9,7 +9,7 @@ export const loginUser = createAsyncThunk(
             const response = await authAPI.loginUser(data);
             return response.data;
         } catch (error) {
-            rejectWithValue(error);
+            return rejectWithValue(error);
         }
     }
 );
@@ -22,7 +22,7 @@ export const loadUser = createAsyncThunk(
             const response = await authAPI.loadUser();
             return response.data;
         } catch (error) {
-            rejectWithValue(error);
+            return rejectWithValue(error);
         }
     }
 );
@@ -35,7 +35,7 @@ export const signupUser = createAsyncThunk(
             const response = await authAPI.signupUser(data);
             return response.data;
         } catch (error) {
-            rejectWithValue(error);
+            return rejectWithValue(error.response.data);
         }
     }
 );
@@ -48,7 +48,7 @@ export const verifyUser = createAsyncThunk(
             const response = await authAPI.verifyUser(data);
             return response.data;
         } catch (error) {
-            rejectWithValue(error);
+            return rejectWithValue(error);
         }
     }
 );
@@ -61,7 +61,7 @@ export const resendOtp = createAsyncThunk(
             const response = await authAPI.resendOtp(data);
             return response.data;
         } catch (error) {
-            rejectWithValue(error);
+            return rejectWithValue(error);
         }
     }
 );
@@ -74,7 +74,7 @@ export const retrievePassword = createAsyncThunk(
             const response = await authAPI.retrievePassword(data);
             return response.data;
         } catch (error) {
-            rejectWithValue(error);
+            return rejectWithValue(error);
         }
     }
 );
@@ -87,7 +87,7 @@ export const generateToken = createAsyncThunk(
             const response = await authAPI.generateToken(data);
             return response.data;
         } catch (error) {
-            rejectWithValue(error);
+            return rejectWithValue(error);
         }
     }
 );
@@ -100,7 +100,7 @@ export const createNewPassword = createAsyncThunk(
             const response = await authAPI.createNewPassword(token, data);
             return response.data;
         } catch (error) {
-            rejectWithValue(error);
+            return rejectWithValue(error);
         }
     }
 );
@@ -148,7 +148,7 @@ export const authSlice = createSlice({
         });
         builder.addCase(loadUser.rejected, (state, { payload }) => {
             state.loading = false;
-            state.errors.push(payload);
+            state.errors = [...state, payload];
             state.user = null;
         });
         builder.addCase(signupUser.pending, (state, { payload }) => {

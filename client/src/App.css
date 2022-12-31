@@ -57,7 +57,7 @@ label {
 
 form {
   background-color: #ffffff;
-  min-width: 40%;
+  min-width: 30%;
   min-height:50%;
   padding: 10px;
   margin: 20px auto 20px auto;
@@ -66,6 +66,17 @@ form {
 
 .form-group {
   margin: 5px auto 0px auto;
+}
+
+.form-error {
+  width: 90%;
+  height: inherit;
+  border-radius: 5px;
+  color: #ffffff;
+  background-color: rgb(204, 5, 5);
+  opacity: 0.8;
+  margin: 10px auto 10px auto;
+  padding: 10px;
 }
 
 .input-group {
@@ -79,15 +90,7 @@ form {
   margin-top: 20px;
 }
 
-input[type=text] {
-  background-color: inherit;
-  height: 20px;
-  border: hidden;
-  width: 90%;
-  text-align: left;
-}
-
-input[type=password] {
+input[type=text], input[type=password] {
   background-color: inherit;
   height: 20px;
   border: hidden;
@@ -116,6 +119,36 @@ input[type=password]:focus {
   outline: none;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+    transition: background-color 600000s 0s, color 600000s 0s;
+}
+
+input[data-autocompleted] {
+    background-color: transparent !important;
+}
+
+.icon-style {
+  background: transparent;
+}
+
+.spinner {
+  background: transparent;
+  animation: spin infinite 1s linear;
+
+  /*You can increase or decrease the timer (5s) to 
+   increase or decrease the speed of the spinner*/
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 footer {
   background-color: #050505;
   text-align: center;
@@ -129,10 +162,6 @@ footer {
 .image-thumbnail {
   width: 100px;
   height: 100px;
-}
-
-.direction-icon-style {
-  background-color: inherit;
 }
 
 div {
@@ -316,6 +345,10 @@ a {
   .banner-image {
     height: 40vh;
     width: 100%;
+  }
+
+  form {
+    min-width: 90%;
   }
 
   .product-list {

@@ -1,13 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { Fragment, useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import Signupform from '../components/auth/Signupform';
-import { signupUser, verifyUser } from '../reducers/authSlice';
+import OTPCheck from '../components/auth/OTPCheck';
 
 const Signup = () => {
-    const dispatch = useDispatch();
     const { message, loading, user, errors } = useSelector((state) => state.auth);
 
-    return (<Signupform />)
+    if (JSON.stringify(message) === '{}') {
+        return (
+            <Fragment>
+                <Signupform errors={errors} loading={loading} />
+                <OTPCheck loading={loading} errors={errors} />
+            </Fragment>
+        );
+    } else if (message && message.status === 'processing request') {
+        return (<OTPCheck loading={loading} errors={errors} />);
+    } else if (message && message.status === 'activation successful') {}
 }
 
 export default Signup;
