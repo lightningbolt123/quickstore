@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import InputField from '../layout/InputField';
@@ -7,6 +7,7 @@ import PhoneInputField from '../layout/PhoneInputField';
 import PasswordInputField from '../layout/PasswordInputField';
 import { signupUser } from '../../reducers/authSlice';
 import Button from '../layout/Button';
+import FormErrorAlert from '../layout/FormErrorAlert';
 
 const Signupform = ({ errors, loading }) => {
     const [ formData, setFormData ] = useState({
@@ -101,9 +102,7 @@ const Signupform = ({ errors, loading }) => {
             <span style={{ color: '#555', fontSize: '24px' }}>Signup</span>
 
             {formError && formError ? '' : (
-                <div className='form-error'>
-                    <span>{formError.msg}</span><br />
-                </div>
+                <FormErrorAlert error={formError} />
             )}
             
             
