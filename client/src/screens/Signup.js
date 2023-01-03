@@ -2,20 +2,23 @@ import { Fragment, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Signupform from '../components/auth/Signupform';
 import OTPCheck from '../components/auth/OTPCheck';
+import Success from '../components/layout/Success';
+import Spinner from '../components/layout/Spinner';
 
 const Signup = () => {
-    const { message, loading, user, errors } = useSelector((state) => state.auth);
+    const { message, loading, errors, user } = useSelector((state) => state.auth);
 
-    if (JSON.stringify(message) === '{}') {
-        return (
-            <Fragment>
-                <Signupform errors={errors} loading={loading} />
-                <OTPCheck loading={loading} errors={errors} />
-            </Fragment>
-        );
-    } else if (message && message.status === 'processing request') {
-        return (<OTPCheck loading={loading} errors={errors} />);
-    } else if (message && message.status === 'activation successful') {}
+    if (user === null || message.status === 'unauthorized') {
+        return <Signupform errors={errors} loading={loading} message={message} />;
+    } else if (message.status === 'processing request'
+    || message.status === 'activation unsuccessful'
+    || message.status === 'not found') {
+        return (<OTPCheck loading={loading} message={message} phonenumber ={user.phonenumber} />);
+    } else if (message && message.status === 'activation successful') {
+        return <Success />
+    } else {
+        return <Spinner />
+    }
 }
 
 export default Signup;

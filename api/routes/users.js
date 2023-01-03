@@ -122,6 +122,7 @@ router.post('/', [
             }
         } catch (error) {
             if (error) {
+                console.log(error);
                 // Return error if the OTP fails to deliver
                 return res.status(503).json({
                     errors: [
@@ -136,6 +137,7 @@ router.post('/', [
         }
     } catch (error) {
         if (error) {
+            console.log(error);
             // Return error if the server encounters an error while creating or fetching user account details
             return res.status(503).json({
                 errors: [
@@ -157,9 +159,9 @@ router.post('/verifyaccount', [
     check('otp','The otp must be of numerical value.').isNumeric().isLength({ min:6 }),
     check('phonenumber','The phone number cannot be empty be empty.').not().isEmpty()
 ], async (req, res) => {
-    const error = validationResult(req);
-    if (!error.isEmpty()) {
-        return res.status(400).json(error);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
     }
     const { otp, phonenumber } = req.body;
     try {
@@ -177,9 +179,20 @@ router.post('/verifyaccount', [
                 ]
             });
         }
-        try {
-             // Send verification code to the user's phone number
-            await otpCheck(phonenumber, otp);
+         // Send verification code to the user's phone number
+         const verification = await otpCheck(phonenumber, otp);
+         if (verification.status === 'pending') {
+            // Return error response
+            return res.status(400).json({
+                errors: [
+                    {
+                        msg: 'The OTP you sent is incorrect. Please resebd OTP and try again later, thank you.',
+                        status: 'activation unsuccessful',
+                        status_code: '400'
+                    }
+                ]
+            });
+         } else {
             // Activate user account
             await User.findOneAndUpdate({ phonenumber }, { active: true }, { new: true });
             // Return success response
@@ -188,23 +201,20 @@ router.post('/verifyaccount', [
                 status: 'activation successful',
                 status_code: '200'
             });
-        } catch (error) {
-            if (error) {
-                console.log(error.message);
-                return res.status(503).json({
-                    errors: [
-                        {
-                            msg: 'We encountered an error while we were trying to verify the otp you sent. Please resend the otp and try again later, thank you.',
-                            status: 'service unavailable',
-                            status_code: '503'
-                        }
-                    ]
-                });
-            }
-        }
+         }
     } catch (error) {
-        if (error) {
-            console.log(error);
+        if (error.status === 404) {
+            console.log(error.status);
+            return res.status(400).json({
+                errors: [
+                    {
+                        msg: 'The OTP you sent does not exist. Please resend the OTP and try again.',
+                        status: 'activation unsuccessful',
+                        status_code: '400'
+                    }
+                ]
+            });
+        } else {
             return res.status(503).json({
                 errors: [
                     {
@@ -222,7 +232,6 @@ router.post('/verifyaccount', [
 // @Desc    Route for resending otp
 // @Access  Public
 router.post('/resend_otp', [
-    check('countrycode','Country code cannot be empty.').isNumeric().isLength({ min:1 }),
     check('phonenumber','Phone number requires a minimum of eight numerical values.').isNumeric().isLength({ min:8 })
 ],async (req, res) => {
     // Check body request for errors
@@ -230,10 +239,10 @@ router.post('/resend_otp', [
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    const { countrycode, phonenumber } = req.body;
+    const { phonenumber } = req.body;
     try {
         // Send otp to mobile number
-        const verification = await smsVerification(countrycode, phonenumber);
+        const verification = await smsVerification(phonenumber);
         // Check the sms verification status and return sucess message if successful
         if (verification.status === 'pending') {
             return res.status(200).json({

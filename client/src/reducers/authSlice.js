@@ -9,7 +9,7 @@ export const loginUser = createAsyncThunk(
             const response = await authAPI.loginUser(data);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error);
+            return rejectWithValue(error.response.data);
         }
     }
 );
@@ -22,7 +22,7 @@ export const loadUser = createAsyncThunk(
             const response = await authAPI.loadUser();
             return response.data;
         } catch (error) {
-            return rejectWithValue(error);
+            return rejectWithValue(error.response.data);
         }
     }
 );
@@ -48,7 +48,7 @@ export const verifyUser = createAsyncThunk(
             const response = await authAPI.verifyUser(data);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error);
+            return rejectWithValue(error.response.data);
         }
     }
 );
@@ -61,7 +61,7 @@ export const resendOtp = createAsyncThunk(
             const response = await authAPI.resendOtp(data);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error);
+            return rejectWithValue(error.response.data);
         }
     }
 );
@@ -74,7 +74,7 @@ export const retrievePassword = createAsyncThunk(
             const response = await authAPI.retrievePassword(data);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error);
+            return rejectWithValue(error.response.data);
         }
     }
 );
@@ -87,7 +87,7 @@ export const generateToken = createAsyncThunk(
             const response = await authAPI.generateToken(data);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error);
+            return rejectWithValue(error.response.data);
         }
     }
 );
@@ -100,7 +100,7 @@ export const createNewPassword = createAsyncThunk(
             const response = await authAPI.createNewPassword(token, data);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error);
+            return rejectWithValue(error.response.data);
         }
     }
 );
@@ -122,6 +122,7 @@ export const authSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder.addCase(loginUser.pending, (state, { payload }) => {
+            state.user = null;
             state.message = {};
             state.errors = [];
             state.loading = true;
@@ -153,16 +154,22 @@ export const authSlice = createSlice({
         });
         builder.addCase(signupUser.pending, (state, { payload }) => {
             state.message = {};
+            state.user = null;
             state.errors = [];
             state.loading = true;
         });
         builder.addCase(signupUser.fulfilled, (state, { payload }) => {
             state.loading = false;
             state.message = payload;
+            state.user = { phonenumber: payload.data };
         });
         builder.addCase(signupUser.rejected, (state, { payload }) => {
             state.loading = false;
-            state.errors = payload.errors;
+            if (payload.errors.length === 1) {
+                state.message = payload.errors[0];
+            } else {
+                state.errors = payload.errors;
+            }
         });
         builder.addCase(verifyUser.pending, (state, { payload }) => {
             state.message = {};
@@ -170,11 +177,12 @@ export const authSlice = createSlice({
             state.loading = true;
         });
         builder.addCase(verifyUser.fulfilled, (state, { payload }) => {
+            state.user = null;
             state.message = payload;
             state.loading = false;
         });
         builder.addCase(verifyUser.rejected, (state, { payload }) => {
-            state.errors = payload.errors;
+            state.message = payload.errors[0];
             state.loading = false;
         });
         builder.addCase(resendOtp.pending, (state, { payload }) => {
@@ -188,7 +196,7 @@ export const authSlice = createSlice({
         });
         builder.addCase(resendOtp.rejected, (state, { payload }) => {
             state.loading = false;
-            state.errors = payload.errors;
+            state.message = payload.errors[0];
         });
         builder.addCase(retrievePassword.pending, (state, { payload }) => {
             state.message = {};

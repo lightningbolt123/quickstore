@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import InputField from '../layout/InputField';
 import { faUser, faEnvelope, faLock, faHouse, faLocationArrow, faMap, faCity, faGlobe, faAddressCard, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
 import PhoneInputField from '../layout/PhoneInputField';
 import PasswordInputField from '../layout/PasswordInputField';
 import { signupUser } from '../../reducers/authSlice';
 import Button from '../layout/Button';
-import FormErrorAlert from '../layout/FormErrorAlert';
+import FormAlert from '../layout/FormAlert';
 
-const Signupform = ({ errors, loading }) => {
+const Signupform = ({ errors, loading, message }) => {
     const [ formData, setFormData ] = useState({
         firstname:'',
         lastname:'',
@@ -27,12 +27,6 @@ const Signupform = ({ errors, loading }) => {
 
     const [ passwordError, setPasswordError ] = useState(false);
 
-    const [ formError, setFormError ] = useState({
-        message:'',
-        status:'',
-        statusCode:''
-    });
-
     const dispatch = useDispatch();
 
     const getError = (name) => {
@@ -40,12 +34,6 @@ const Signupform = ({ errors, loading }) => {
         if (findError.length > 0) {
             const error = errors.find(error => error.param === name);
             return error;
-        } else {
-            if (typeof errors[0] !== 'undefined') {
-               setTimeout(() => {
-                setFormError({...formError, message: errors[0].msg, status: errors[0].status, statusCode: errors[0].status_code });
-               }, 3000);
-            }
         }
     }
 
@@ -101,9 +89,7 @@ const Signupform = ({ errors, loading }) => {
         <form onSubmit={(e) => onSubmitHandler(e)}>
             <span style={{ color: '#555', fontSize: '24px' }}>Signup</span>
 
-            {formError && formError ? '' : (
-                <FormErrorAlert error={formError} />
-            )}
+            {JSON.stringify(message) !== '{}' ? (<FormAlert alert={message} />) : ''}
             
             
             <InputField type='text' label='Firstname' name='firstname' value={firstname} error={getError('firstname')} changeHandler={onChange} icon={faUser} />
@@ -140,6 +126,7 @@ Signupform.propTypes = {
     passwordError: PropTypes.bool,
     formError: PropTypes.object,
     errors: PropTypes.array,
+    message: PropTypes.object,
     loading: PropTypes.bool
 }
 

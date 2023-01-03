@@ -55,10 +55,10 @@ label {
   margin: 10px;
 }
 
-form {
+form, .success-box-style {
   background-color: #ffffff;
   min-width: 30%;
-  min-height:50%;
+  min-height: 50%;
   padding: 10px;
   margin: 20px auto 20px auto;
   border-radius: 5px;
@@ -68,8 +68,8 @@ form {
   margin: 5px auto 0px auto;
 }
 
-.form-error {
-  width: 90%;
+.form-alert {
+  width: 500px;
   height: inherit;
   border-radius: 5px;
   color: #ffffff;
@@ -221,6 +221,12 @@ a {
   box-shadow: 5px 5px 5px rgb(168, 168, 168);
 }
 
+.success-style {
+  width: 300px;
+  margin: auto;
+  display: block;
+}
+
 .product-card-image {
   border-radius: 5px 5px 0 0;
   width: 100%;
@@ -345,6 +351,11 @@ a {
 
   form {
     min-width: 90%;
+    max-width: 90%;
+  }
+
+  .form-alert {
+    width: inherit;
   }
 
   .product-list {

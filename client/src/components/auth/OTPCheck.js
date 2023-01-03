@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { useDispatch } from 'react-redux';
 import Button from '../layout/Button';
 import NumberField from '../layout/NumberField';
-import FormErrorAlert from '../layout/FormErrorAlert';
+import FormAlert from '../layout/FormAlert';
+import { verifyUser } from '../../reducers/authSlice';
 
-const OTPCheck = ({ loading, errors, message }) => {
+const OTPCheck = ({ loading, message, phonenumber }) => {
     const [formData, setFormData] = useState({
         box1:'',
         box2:'',
@@ -14,6 +16,8 @@ const OTPCheck = ({ loading, errors, message }) => {
         box5:'',
         box6:''
     });
+
+    const dispatch = useDispatch();
 
     const onChange = (e) => {
         if (e.target.value.length < 2 && !isNaN(e.target.value)) {
@@ -33,19 +37,14 @@ const OTPCheck = ({ loading, errors, message }) => {
     const onSubmit = (e) => {
         e.preventDefault();
         const otp = `${box1}${box2}${box3}${box4}${box5}${box6}`;
-        let phonenumber;
-        if (message && message.data) {
-            phonenumber = message.data.phonenumber;
-        }
-        const newData = { otp };
-        if (phonenumber) newData.phonenumber = phonenumber;
-        console.log(newData);
+        const data = { otp, phonenumber };
+        dispatch(verifyUser(data));
     }
     return (
         <form onSubmit={(e) => onSubmit(e)}>
             <span style={{ color: '#555', fontSize: '24px' }}>Verify OTP</span>
-
-            {errors && errors ? '' : (<FormErrorAlert error={errors[0]} />)}
+            
+            {JSON.stringify(message) !== '{}' ? (<FormAlert alert={message} />) : ''}
             
             <div style={{ display: 'flex', flexDirection: 'row' }}>
                 {Object.entries(formData).map(([key, value], index) => (
@@ -60,8 +59,8 @@ const OTPCheck = ({ loading, errors, message }) => {
 
 OTPCheck.propTypes = {
     loading: PropTypes.bool,
-    errors: PropTypes.array,
-    message: PropTypes.object
+    message: PropTypes.object,
+    phonenumber: PropTypes.string
 };
 
 export default OTPCheck;
