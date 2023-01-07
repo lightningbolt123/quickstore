@@ -107,7 +107,8 @@ export const createNewPassword = createAsyncThunk(
 
 // The initial state of the reducer
 const initialState = {
-    token: localStorage.getItem("QuickstoreToken"),
+    token: localStorage.getItem("token"),
+    isAuthenticated: false,
     loading: false,
     message: {},
     errors: [],
@@ -131,25 +132,34 @@ export const authSlice = createSlice({
             if (payload.status === 'created') {
                 state.message = payload;
             } else {
-                state.token = localStorage.setItem("QuickstoreToken", payload.data);
+                localStorage.setItem("token", payload.data);
             }
             state.loading = false;
+            state.isAuthenticated = true;
         });
         builder.addCase(loginUser.rejected, (state, { payload }) => {
-            state.errors = payload.errors;
+            if (payload.errors.length === 1) {
+                state.message = payload.errors[0];
+            } else {
+                state.errors = payload.errors;
+            }
             state.loading = false;
+            state.isAuthenticated = false;
         });
         builder.addCase(loadUser.pending, (state, { payload }) => {
             state.errors = [];
+            state.message = {};
             state.loading = true;
+            state.isAuthenticated = false;
         });
         builder.addCase(loadUser.fulfilled, (state, { payload }) => {
-            state.user = payload.data
+            state.user = payload.data;
+            state.isAuthenticated = true;
             state.loading = false;
         });
         builder.addCase(loadUser.rejected, (state, { payload }) => {
             state.loading = false;
-            state.errors = [...state, payload];
+            state.message = payload;
             state.user = null;
         });
         builder.addCase(signupUser.pending, (state, { payload }) => {

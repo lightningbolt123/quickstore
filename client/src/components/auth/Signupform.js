@@ -9,7 +9,7 @@ import { signupUser } from '../../reducers/authSlice';
 import Button from '../layout/Button';
 import FormAlert from '../layout/FormAlert';
 
-const Signupform = ({ errors, loading, message }) => {
+const SignupForm = ({ errors, loading, message }) => {
     const [ formData, setFormData ] = useState({
         firstname:'',
         lastname:'',
@@ -121,7 +121,7 @@ const Signupform = ({ errors, loading, message }) => {
     )
 };
 
-Signupform.propTypes = {
+SignupForm.propTypes = {
     formData: PropTypes.object,
     passwordError: PropTypes.bool,
     formError: PropTypes.object,
@@ -130,4 +130,4 @@ Signupform.propTypes = {
     loading: PropTypes.bool
 }
 
-export default Signupform;
+export default SignupForm;

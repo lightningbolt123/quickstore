@@ -1,18 +1,15 @@
-import spinner_01 from '../spinner_01.gif';
+import spinner_04 from '../spinner_04.gif';
 
 const Spinner = () => {
     return (
-        <form>
-            <img src={spinner_01} style={spinnerStyle} alt='loading...' />
-        </form>
+        <img src={spinner_04} style={spinnerStyle} alt='loading...' />
     );
 }
 
 const spinnerStyle = {
     marginLeft: 'auto',
     marginRight: 'auto',
-    marginTop: '30px',
-    marginBottom: '30px'
+    marginTop: '50px',
 };
 
 export default Spinner;

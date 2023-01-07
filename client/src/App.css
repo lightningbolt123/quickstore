@@ -57,11 +57,15 @@ label {
 
 form, .success-box-style {
   background-color: #ffffff;
-  min-width: 30%;
+  width: 25%;
   min-height: 50%;
   padding: 10px;
   margin: 20px auto 20px auto;
   border-radius: 5px;
+}
+
+.dashboard-form {
+  width: 50%;
 }
 
 .form-group {
@@ -69,7 +73,7 @@ form, .success-box-style {
 }
 
 .form-alert {
-  width: 500px;
+  width: 90%;
   height: inherit;
   border-radius: 5px;
   color: #ffffff;
@@ -88,6 +92,25 @@ form, .success-box-style {
   border-bottom-style: groove;
   width: inherit;
   margin-top: 20px;
+}
+
+.dashboard-container {
+  margin: 10px auto 10px auto;
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 5px;
+  max-width: 50%;
+}
+
+.dashboard-nav {
+  display: flex;
+  flex-flow: row wrap;
+  flex-direction: row;
+  padding: 10px;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  background: inherit;
 }
 
 input[type=text], input[type=password], input[type=number] {
@@ -198,6 +221,7 @@ div {
 
 .remove-link-style {
   all: unset;
+  cursor: pointer;
 }
 
 .product-card {
@@ -350,12 +374,16 @@ a {
   }
 
   form {
-    min-width: 90%;
-    max-width: 90%;
+    width: 90%;
   }
 
-  .form-alert {
-    width: inherit;
+  .dashboard-container {
+    max-width: 90%;
+  }
+  
+
+  .dashboard-form {
+    width: 90%;
   }
 
   .product-list {

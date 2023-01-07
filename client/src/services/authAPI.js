@@ -31,8 +31,10 @@ const loginUser = async (data) => {
 };
 
 const loadUser = async () => {
-    const token = localStorage.getItem("QuickstoreToken");
-    setAuthToken(token)
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
     return axios.get('http://localhost:5000/api/auth', headerConfig)
 };
 
