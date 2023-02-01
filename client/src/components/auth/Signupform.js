@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import InputField from '../layout/InputField';
 import { faUser, faEnvelope, faLock, faHouse, faLocationArrow, faMap, faCity, faGlobe, faAddressCard, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
 import PhoneInputField from '../layout/PhoneInputField';
 import PasswordInputField from '../layout/PasswordInputField';
-import { signupUser } from '../../reducers/authSlice';
+import { signupUser, clearMessages } from '../../reducers/authSlice';
 import Button from '../layout/Button';
 import FormAlert from '../layout/FormAlert';
 
@@ -28,6 +28,10 @@ const SignupForm = ({ errors, loading, message }) => {
     const [ passwordError, setPasswordError ] = useState(false);
 
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(clearMessages());
+    },[]);
 
     const getError = (name) => {
         const findError = errors.filter(error => error.param === name);
@@ -83,6 +87,9 @@ const SignupForm = ({ errors, loading, message }) => {
                 setPasswordError(current => !current);
             },3000)
         }
+        setTimeout(() => {
+            dispatch(clearMessages());
+        },3000);
     }
 
     return (

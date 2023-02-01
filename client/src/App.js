@@ -3,7 +3,6 @@ import 'react-phone-number-input/style.css'
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getProducts } from './reducers/productSlice';
 import { loadUser } from './reducers/authSlice';
 import setAuthToken from './utils/setAuthToken';
 import Products from './screens/Products';
@@ -15,16 +14,20 @@ import Login from './screens/Login';
 import Dashboard from './screens/Dashboard';
 import Settings from './screens/Settings';
 import PrivateRoute from './components/routing/PrivateRoute';
+import Store from './screens/Store';
 
-const token =localStorage.getItem("token");
+const token = localStorage.getItem("token");
 if (token) {
   setAuthToken(token); 
 }
 
 function App() {
   const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state) => state.auth);
   useEffect(() => {
-    dispatch(loadUser());
+    if (!isAuthenticated && token) {
+      dispatch(loadUser());
+    }
   }, []);
 
   return (
@@ -38,6 +41,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<PrivateRoute component={Dashboard} />} />
           <Route path="/settings" element={<PrivateRoute component={Settings} />} />
+          <Route path="/store" element={<PrivateRoute component={Store} />} />
         </Routes>
       </div>
       <Footer />

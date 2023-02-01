@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import InputField from '../components/layout/InputField';
 import Button from '../components/layout/Button';
 import { faEnvelope, faUserCircle, faLock, faArrowRightToBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { loginUser } from '../reducers/authSlice';
+import { loginUser, clearMessages } from '../reducers/authSlice';
 import FormAlert from '../components/layout/FormAlert';
 import Spinner from '../components/layout/Spinner';
 
@@ -19,6 +19,10 @@ const Login = () => {
 
     const dispatch = useDispatch();
     const { errors, message, loading, isAuthenticated } = useSelector((state) => state.auth);
+
+    useEffect(() => {
+        dispatch(clearMessages());
+    },[dispatch]);
 
     const onChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,6 +40,9 @@ const Login = () => {
         e.preventDefault();
         const data = { email, password };
         dispatch(loginUser(data));
+        setTimeout(() => {
+            dispatch(clearMessages());
+        },3000);
     }
 
     if (loading) return <Spinner />

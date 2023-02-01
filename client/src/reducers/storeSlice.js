@@ -45,7 +45,6 @@ export const fetchStore = createAsyncThunk(
 const initialState = {
     store: null,
     stores: [],
-    myStore: null,
     loading: false,
     errors: []
 }
@@ -58,11 +57,11 @@ export const storeSlice = createSlice({
     extraReducers: (builder) => {
         builder.addCase(fetchLoggedInUserStore.pending, (state, { payload }) => {
             state.loading = true;
-            state.myStore = null;
+            state.store = null;
         });
         builder.addCase(fetchLoggedInUserStore.fulfilled, (state, { payload }) => {
             state.loading = false;
-            state.myStore = payload.data;
+            state.store = payload.data;
         });
         builder.addCase(fetchLoggedInUserStore.rejected, (state, { payload }) => {
             state.loading = false;

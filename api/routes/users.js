@@ -512,8 +512,7 @@ router.put('/account', [
         check('firstname','Firstname field cannot be empty').not().isEmpty(),
         check('lastname','Lastname field cannot be empty').not().isEmpty(),
         check('email','Email field cannot be empty').not().isEmpty(),
-        check('countrycode','Country code cannot be empty').not().isEmpty(),
-        check('phonenumber','Phone number must be a numeric value').isNumeric().isLength({ min:8 })
+        check('phonenumber','Phone number cannot be empty').not().isEmpty()
     ]
 ], async (req, res) => {
     const errors = validationResult(req);
@@ -528,13 +527,13 @@ router.put('/account', [
         firstname,
         lastname,
         email,
+        phonenumber,
         house,
         street,
+        town,
         city,
         postalcode,
-        country,
-        countrycode,
-        phonenumber
+        country
     } = req.body;
     try {
 
@@ -543,10 +542,10 @@ router.put('/account', [
         userObject.firstname = firstname;
         userObject.lastname = lastname;
         userObject.email = email;
-        userObject.countrycode = countrycode;
         userObject.phonenumber = phonenumber;
         if (house) userObject.house = house;
         if (street) userObject.street = street;
+        if (town) userObject.town = town;
         if (city) userObject.city = city;
         if (postalcode) userObject.postalcode = postalcode;
         if (country) userObject.country = country;
@@ -561,12 +560,13 @@ router.put('/account', [
             });
         }
         // Update user details on the database
-        user = await User.findByIdAndUpdate(req.user.id, userObject);
+        user = await User.findByIdAndUpdate(req.user.id, userObject, { new: true }).select('-password');
         // Return success message
         return res.status(201).json({
             msg: 'You have successfully updated your account.',
             status: 'created',
-            status_code: '201'
+            status_code: '201',
+            data: user
         });
     } catch (error) {
         // Return error if the server was unable to retrieve the user details from the database
@@ -585,12 +585,14 @@ router.put('/account', [
 // @Access  Private
 router.post('/change_password', [
     auth,
-    body('password','Password must contain a minimum of eight characters.').isLength({ min: '8' })
+    [
+        check('password','Password must contain a minimum of eight characters.').isLength({ min: '8' })
+    ]
 ], async (req, res) => {
     // Check for error in body request
-    const error = validationResult(req);
-    if (!error.isEmpty()) {
-        return res.status(400).json(error.errors[0]);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
     }
     // Destructure the password from the body
     const { password } = req.body;
@@ -664,19 +666,29 @@ router.post('/photo', [
                     secure_url: uploadPicture.secure_url
                 };
                 // Update user account
-                user = await User.findByIdAndUpdate({ _id: req.user.id }, { photo: photoObject });
+                user = await User.findByIdAndUpdate({ _id: req.user.id }, { photo: photoObject }, { new: true });
                 // Return success message
                 return res.status(201).json({
                     msg: 'Your profile photo was uploaded successfully.',
                     status: 'created',
-                    status_code: '201'
+                    status_code: '201',
+                    data: user
                 });
             } else {
-                await cloudinary.v2.uploader.upload(photo, { public_id: user.photo.public_id.toString() });
+                const uploadPicture = await cloudinary.v2.uploader.upload(photo, { public_id: user.photo.public_id.toString() });
+                // Create photo object to be saved on the user database
+                const photoObject = {
+                    public_id: uploadPicture.public_id,
+                    secure_url: uploadPicture.secure_url
+                };
+                // Update user account
+                user = await User.findByIdAndUpdate({ _id: req.user.id }, { photo: photoObject }, { new: true });
+                // Return success message
                 return res.status(201).json({
                     msg: 'Your profile photo was updated successfully.',
                     status: 'created',
-                    status_code: '201'
+                    status_code: '201',
+                    data: user
                 });
             }
         } catch (error) {

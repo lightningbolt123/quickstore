@@ -79,7 +79,7 @@ export const retrievePassword = createAsyncThunk(
     }
 );
 
-// Function for generating authentication token when reseting forotten password
+// Function for generating authentication token when reseting forgotten password
 export const generateToken = createAsyncThunk(
     "auth/generateTokenStatus",
     async (data, { rejectWithValue }) => {
@@ -105,6 +105,45 @@ export const createNewPassword = createAsyncThunk(
     }
 );
 
+// Function for updating user profile
+export const updateAccount = createAsyncThunk(
+    "auth/updateAccountStatus",
+    async (data, { rejectWithValue }) => {
+        try {
+            const response = await authAPI.editAccount(data);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+// Function for changing the logged in user password
+export const changePassword = createAsyncThunk(
+    "auth/changePasswordStatus",
+    async (data, { rejectWithValue }) => {
+        try {
+            const response = await authAPI.changePassword(data);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+// Function for uploading user profile picture
+export const photoUpload = createAsyncThunk(
+    "auth/uploadPhotoStatus",
+    async (data, { rejectWithValue }) => {
+        try {
+            const response = await authAPI.uploadPicture(data);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+)
+
 // The initial state of the reducer
 const initialState = {
     token: localStorage.getItem("token"),
@@ -113,14 +152,29 @@ const initialState = {
     message: {},
     errors: [],
     user: null,
-    passwordResetToken: ''
+    passwordResetToken: '',
+    accountUpdating: false,
+    passwordChangeLoading: false,
+    photoUploadMessage: {},
+    photoUploadLoading: false
 };
 
 // The auth slice
 export const authSlice = createSlice({
     name: "auth",
     initialState,
-    reducers: {},
+    reducers: {
+        clearMessages: (state) => {
+            state.message = {};
+            state.errors = [];
+            state.photoUploadMessage = {};
+        },
+        logout: (state) => {
+            state.token = localStorage.removeItem("token");
+            state.isAuthenticated = false;
+            state.user = null;
+        }
+    },
     extraReducers: (builder) => {
         builder.addCase(loginUser.pending, (state, { payload }) => {
             state.user = null;
@@ -248,7 +302,54 @@ export const authSlice = createSlice({
             state.loading = false;
             state.errors.push(payload);
         });
+        builder.addCase(updateAccount.pending, (state, { payload }) => {
+            state.accountUpdating = true;
+        });
+        builder.addCase(updateAccount.fulfilled, (state, { payload }) => {
+            state.accountUpdating = false;
+            state.user = payload.data;
+            const { data, ...rest } = payload;
+            state.message = rest;
+        });
+        builder.addCase(updateAccount.rejected, (state, { payload }) => {
+            state.accountUpdating = false;
+            if (payload.errors && payload.errors.length > 0) {
+                state.errors = payload.errors;
+            } else {
+                state.message = payload;
+            }
+        });
+        builder.addCase(changePassword.pending, (state, { payload }) => {
+            state.passwordChangeLoading = true;
+        });
+        builder.addCase(changePassword.fulfilled, (state, { payload }) => {
+            state.passwordChangeLoading = false;
+            state.message = payload;
+        });
+        builder.addCase(changePassword.rejected, (state, { payload }) => {
+            state.passwordChangeLoading = false;
+            if (payload.errors) {
+                state.errors = payload.errors;
+            } else {
+                state.message = payload;
+            }
+        });
+        builder.addCase(photoUpload.pending, (state, { payload }) => {
+            state.photoUploadLoading = true;
+        });
+        builder.addCase(photoUpload.fulfilled, (state, { payload }) => {
+            state.photoUploadLoading = false;
+            const { data, ...rest } = payload;
+            state.photoUploadMessage = rest;
+            state.user = data;
+        });
+        builder.addCase(photoUpload.rejected, (state, { payload }) => {
+            state.photoUploadLoading = false;
+            state.photoUploadMessage = payload;
+        });
     }
 });
+
+export const { clearMessages, logout } = authSlice.actions;
 
 export default authSlice.reducer;

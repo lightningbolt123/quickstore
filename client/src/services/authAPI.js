@@ -38,6 +38,29 @@ const loadUser = async () => {
     return axios.get('http://localhost:5000/api/auth', headerConfig)
 };
 
+const editAccount = async (data) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return axios.put('http://localhost:5000/api/users/account', JSON.stringify(data), headerConfig);
+}
+
+const changePassword = async (data) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return axios.post('http://localhost:5000/api/users/change_password', JSON.stringify(data), headerConfig);
+}
+
+const uploadPicture = async (data) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return axios.post('http://localhost:5000/api/users/photo', JSON.stringify(data), headerConfig);
+}
 
 export const authAPI = {
     signupUser,
@@ -47,5 +70,8 @@ export const authAPI = {
     generateToken,
     createNewPassword,
     loginUser,
-    loadUser
+    loadUser,
+    editAccount,
+    changePassword,
+    uploadPicture
 }

@@ -1,14 +1,28 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import EditProfile from '../components/settings/EditProfile';
 import ChangePassword from '../components/settings/ChangePassword';
+import { loadUser } from '../reducers/authSlice';
+import ProfilePicture from '../components/settings/ProfilePicture';
 
 const Settings = () => {
-    const { errors, loading } = useSelector((state) => state.auth);
+    const { errors, accountUpdating, passwordChangeLoading, photoUploadMessage, isAuthenticated, user, message } = useSelector((state) => state.auth);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (isAuthenticated && user === null) {
+            dispatch(loadUser());
+        } else if (!isAuthenticated) {
+            dispatch(loadUser());
+        }
+    }, []);
+
     return (
         <Fragment>
-            <EditProfile errors={errors} loading={loading} />
-            <ChangePassword loading={loading} errors={errors} />
+            <ProfilePicture message={photoUploadMessage} photo={user? user.photo.secure_url : ''} />
+            <EditProfile errors={errors} loading={accountUpdating} user={user} message={message} />
+            <ChangePassword loading={passwordChangeLoading} errors={errors} />
         </Fragment>
     )
 }

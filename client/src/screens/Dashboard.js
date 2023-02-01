@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { faHeart, faGear, faList, faStore, faFileInvoice, faBuildingColumns } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -48,7 +48,7 @@ const Dashboard = () => {
                 <h1>Dashboard</h1>
                 <div className='dashboard-nav'>
                     {links.map(link => (
-                        <div key={link.id} style={{ width: '150px', height:'150px', marginTop: '10px', marginLeft: '0px' }}>
+                        <div key={link.id} style={{ width: '150px', height:'150px', marginTop: '10px' }}>
                             <FontAwesomeIcon style={{ background: 'none', marginBottom: '10px', color: `${link.color}` }} icon={link.icon} size='4x' /><br />
                             <Link to={`/${link.path}`} style={{ fontSize: '18px' }} className='remove-link-style'>{link.name}</Link>
                         </div>
