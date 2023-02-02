@@ -15,6 +15,7 @@ import Dashboard from './screens/Dashboard';
 import Settings from './screens/Settings';
 import PrivateRoute from './components/routing/PrivateRoute';
 import Store from './screens/Store';
+import CreateStore from './screens/CreateStore';
 
 const token = localStorage.getItem("token");
 if (token) {
@@ -42,6 +43,7 @@ function App() {
           <Route path="/dashboard" element={<PrivateRoute component={Dashboard} />} />
           <Route path="/settings" element={<PrivateRoute component={Settings} />} />
           <Route path="/store" element={<PrivateRoute component={Store} />} />
+          <Route path="/create-store" element={<PrivateRoute component={CreateStore} />} />
         </Routes>
       </div>
       <Footer />

@@ -16,7 +16,7 @@ const Settings = () => {
         } else if (!isAuthenticated) {
             dispatch(loadUser());
         }
-    }, []);
+    }, [dispatch, isAuthenticated, user]);
 
     return (
         <Fragment>

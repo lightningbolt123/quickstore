@@ -9,7 +9,7 @@ export const fetchLoggedInUserStore = createAsyncThunk(
             const response = await storeAPI.getLoggedInUserStore();
             return response.data;
         } catch (error) {
-            rejectWithValue(error);
+            return rejectWithValue(error.response.data);
         }
     }
 );
@@ -22,7 +22,7 @@ export const fetchStores = createAsyncThunk(
             const response = await storeAPI.fetchAllStores();
             return response.data;
         } catch (error) {
-            rejectWithValue(error);
+            return rejectWithValue(error.response.data);
         }
     }
 );
@@ -33,8 +33,9 @@ export const fetchStore = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const response = await storeAPI.fetchStore(id);
+            return response.data;
         } catch (error) {
-            rejectWithValue(error);
+            return rejectWithValue(error.response.data);
         }
     }
 );
@@ -46,6 +47,7 @@ const initialState = {
     store: null,
     stores: [],
     loading: false,
+    error: {},
     errors: []
 }
 
@@ -65,7 +67,7 @@ export const storeSlice = createSlice({
         });
         builder.addCase(fetchLoggedInUserStore.rejected, (state, { payload }) => {
             state.loading = false;
-            state.errors.push(payload);
+            state.error = payload;
         });
         builder.addCase(fetchStores.pending, (state, { payload }) => {
             state.loading = true;
@@ -77,7 +79,7 @@ export const storeSlice = createSlice({
         });
         builder.addCase(fetchStores.rejected, (state, { payload }) => {
             state.loading = false;
-            state.errors.push(payload);
+            state.error = payload;
         });
         builder.addCase(fetchStore.pending, (state, { payload }) => {
             state.pending = true;
@@ -89,7 +91,7 @@ export const storeSlice = createSlice({
         });
         builder.addCase(fetchStore.rejected, (state, { payload }) => {
             state.pending = false;
-            state.errors.push(payload);
+            state.error = payload;
         });
     }
 });

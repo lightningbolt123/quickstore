@@ -2,10 +2,10 @@ import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
-const Button = ({ loading, icon, text }) => {
+const Button = ({ loading, icon, text, color='button-green' }) => {
     return (
         <div className='form-group'>
-            <button className='button-green'>{text} {loading && loading ? (
+            <button className={color}>{text} {loading && loading ? (
                 <FontAwesomeIcon className='spinner' icon={faSpinner} />
             ) : (
                 <FontAwesomeIcon className='icon-style' icon={icon} />

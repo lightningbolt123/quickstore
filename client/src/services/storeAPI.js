@@ -10,8 +10,11 @@ const fetchStore = async (id) => {
     return axios.get(`http://localhost:5000/api/store/all/${id}`, headerConfig);
 }
 
-const fetchLoggedInUserStore = async () => {
-    setAuthToken();
+const getLoggedInUserStore = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
     return axios.get('http://localhost:5000/api/store/mystore', headerConfig);
 }
 
@@ -23,6 +26,6 @@ const createAndUpdateStore = async () => {
 export const storeAPI = {
     fetchAllStores,
     fetchStore,
-    fetchLoggedInUserStore,
+    getLoggedInUserStore,
     createAndUpdateStore
 };
