@@ -28,7 +28,7 @@ const createProduct = async (req, res) => {
         // Loop through the uploaded images object
         for (i=0; i<images.length; i++) {
             // Upload each image
-            const imageUpload = await cloudinary.v2.uploader.upload(images[i], { folder: 'quickstore', resource_type: 'auto' });
+            const imageUpload = await cloudinary.v2.uploader.upload(images[i].photo, { folder: 'quickstore', resource_type: 'auto' });
             // Create a new object containing the public_id and secure_url of the uploaded image
             const newImage = {
                 public_id: imageUpload.public_id,
@@ -49,12 +49,12 @@ const createProduct = async (req, res) => {
         }
         // Check if the product features array was included in the request body and update the product_features object
         if (features) {
-            product_features = features.map(feature => feature.trim());
+            product_features = features;
         } else {
             product_features = [];
         }
         // Upload product
-        await pool.query('INSERT INTO product (store_id, product_name, product_description, product_category, product_price, product_discount, product_images, product_features, product_specifications) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)', [
+        const result = await pool.query('INSERT INTO product (store_id, product_name, product_description, product_category, product_price, product_discount, product_images, product_features, product_specifications) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *', [
             store.rows[0].store_id,
             name,
             description,
@@ -65,12 +65,15 @@ const createProduct = async (req, res) => {
             product_features,
             product_specifications
         ]);
-        // Return success message
-        return res.status(201).json({
-            msg: 'You have successfully uploaded a product to your store.',
-            status: 'created',
-            status_code: '201'
-        });
+        if (result) {
+            // Return success message
+            return res.status(201).json({
+                msg: 'You have successfully uploaded a product to your store.',
+                status: 'created',
+                status_code: '201',
+                data: result.rows[0]
+            });
+        }
     } catch (error) {
         // Return error message if the remote services are unavailable
         if (error) {

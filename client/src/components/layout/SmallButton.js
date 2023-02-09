@@ -2,10 +2,10 @@ import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
-const Button = ({ loading = false, icon, text, color='button-green' }) => {
+const SmallButton = ({ loading = false, icon, text, float='', color='button-small-blue', onClickHandler }) => {
     return (
         <div className='form-group'>
-            <button className={color}>{text} {loading && loading ? (
+            <button style={{ float: float }} onClick={(e) => onClickHandler(e)} className={color}>{text} {loading && loading ? (
                 <FontAwesomeIcon className='spinner' icon={faSpinner} />
             ) : (
                 <FontAwesomeIcon className='icon-style' icon={icon} />
@@ -14,9 +14,10 @@ const Button = ({ loading = false, icon, text, color='button-green' }) => {
     )
 };
 
-Button.propTypes = {
+SmallButton.propTypes = {
     loading: PropTypes.bool,
     icon: PropTypes.object,
-    text: PropTypes.string
+    text: PropTypes.string,
+    onClickHandler: PropTypes.func
 }
-export default Button;
+export default SmallButton;

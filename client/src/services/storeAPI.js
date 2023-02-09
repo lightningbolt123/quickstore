@@ -18,14 +18,26 @@ const getLoggedInUserStore = async () => {
     return axios.get('http://localhost:5000/api/store/mystore', headerConfig);
 }
 
-const createAndUpdateStore = async () => {
-    setAuthToken();
-    return axios.post('http://localhost:5000/api/store', headerConfig);
+const createAndUpdateStore = async (data) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return axios.post('http://localhost:5000/api/store', JSON.stringify(data), headerConfig);
+}
+
+const uploadOrUpdateStoreIcon = async (data) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return axios.post('http://localhost:5000/api/store/icon', JSON.stringify(data), headerConfig);
 }
 
 export const storeAPI = {
     fetchAllStores,
     fetchStore,
     getLoggedInUserStore,
-    createAndUpdateStore
+    createAndUpdateStore,
+    uploadOrUpdateStoreIcon
 };

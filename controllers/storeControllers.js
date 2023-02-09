@@ -64,7 +64,7 @@ const getLoggedInUserStoreById = async (req, res) => {
         // Check if the store exists
         if (store.rows.length === 0) {
             return res.status(404).json({
-                msg: 'You don\'t yet have a store on this platform. Please create one from the menu.',
+                msg: 'You don\'t yet have a store on this platform. Please create one by clicking the button below.',
                 status: 'not found',
                 status_code: '404'
             });
@@ -97,6 +97,7 @@ const createOrUpdateStore = async (req, res) => {
     }
     // Destructure 
     const { name, shop_url, house, street, postalcode, city, country } = req.body;
+    const icon = {};
     try {
         // Check if user exists
         const user = await User.findById(req.user.id);
@@ -111,7 +112,7 @@ const createOrUpdateStore = async (req, res) => {
         let store = await pool.query('SELECT * FROM store WHERE seller_id=$1', [req.user.id]);
         if (store.rows.length === 0) {
             // Create store if the store does not exist
-            store = await pool.query('INSERT INTO store (seller_id, name, shop_url, house, street, postalcode, city, country) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *', [
+            store = await pool.query('INSERT INTO store (seller_id, name, shop_url, house, street, postalcode, city, country, icon) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *', [
                 req.user.id,
                 name,
                 shop_url,
@@ -119,7 +120,8 @@ const createOrUpdateStore = async (req, res) => {
                 street,
                 postalcode,
                 city,
-                country
+                country,
+                icon
             ]);
             // Create wallet
             await pool.query('INSERT INTO wallet (user_id, available_balance, ledger_balance, currency, store_id) VALUES ($1,$2,$3,$4,$5)', [
@@ -196,20 +198,33 @@ const uploadStoreIcon = async (req, res) => {
                 secure_url: uploadPicture.secure_url
             };
             // Update user store details
-            await pool.query('UPDATE store SET icon=$1 WHERE seller_id=$2', [photoObject, req.user.id]);
-            return res.status(201).json({
-                msg: 'You have successfully uploaded your store icon.',
-                status: 'created',
-                status_code: '201'
-            });
+            const updateStore = await pool.query('UPDATE store SET icon=$1 WHERE seller_id=$2', [photoObject, req.user.id]);
+            if (updateStore) {
+                return res.status(201).json({
+                    msg: 'You have successfully uploaded your store icon.',
+                    status: 'created',
+                    status_code: '201',
+                    data: photoObject
+                });
+            }
         } else {
             // Update icon
-            await cloudinary.v2.uploader.upload(icon, { public_id: store.rows[0].icon.public_id.toString() });
-            return res.status(201).json({
-                msg: 'You have successfully updated your store icon',
-                status: 'created',
-                status_code: '201'
-            });
+            const uploadPicture = await cloudinary.v2.uploader.upload(icon, { public_id: store.rows[0].icon.public_id.toString() });
+            // Create photo object
+            const photoObject = {
+                public_id: uploadPicture.public_id,
+                secure_url: uploadPicture.secure_url
+            };
+            // Update user store details
+            const updateStore = await pool.query('UPDATE store SET icon=$1 WHERE seller_id=$2', [photoObject, req.user.id]);
+            if (updateStore) {
+                return res.status(201).json({
+                    msg: 'You have successfully updated your store icon',
+                    status: 'created',
+                    status_code: '201',
+                    data: photoObject
+                });
+            }
         }
     } catch (error) {
         // Check for error in fetching user account details and in the store creation process

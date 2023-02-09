@@ -4,7 +4,7 @@ import PhoneInput, { isPossiblePhoneNumber } from 'react-phone-number-input'
 const PhoneInputField = ({ label, name, value, changeHandler }) => {
     return (
         <div className='form-group'>
-            <label>{label}</label><br />
+            <label style={{ float: 'left' }}>{label}</label><br />
             <div className='input-group'>
                 <PhoneInput defaultCountry='DE' value={value} onChange={(value) => changeHandler(value)} className='PhoneInput' />
             </div>

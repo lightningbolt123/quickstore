@@ -64,11 +64,11 @@ router.post('/products/all', [
     auth,
     [
         check('name','The product name cannot be empty.').not().isEmpty(),
-        check('description','The product description cannot be empty.').not().isEmpty(),
+        check('description','The product description cannot be more than 500 characters long.').isLength({ max: 500 }),
         check('category','The product category cannot be empty.').not().isEmpty(),
         check('price', 'The product price can only take in numbers.').isNumeric().isLength({ min:1 }),
         check('discount','The discount field can only take in numbers and decimals.').isNumeric().isLength({ min:1 }),
-        check('images','Images cannot be empty.').not().isEmpty()
+        check('images','Images cannot be empty.').isArray({ min: 1 })
     ]
 ], productControllers.createProduct);
 

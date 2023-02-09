@@ -21,7 +21,7 @@ const Navigator = () => {
 
     return (
     <div className='menu'>
-        <h2 className='header-logo'>QuickStore <FontAwesomeIcon className='navbar-icon' icon={faBars} onClick={toggleMenu} /></h2>
+        <h2 className='header-logo'><Link className='remove-link-style' to='/'>QuickStore</Link><FontAwesomeIcon className='navbar-icon' icon={faBars} onClick={toggleMenu} /></h2>
         <ul className={menuState? 'hamburger-menu': ''}>
             <li>categories</li>
             {isAuthenticated ? '': (<Fragment>
