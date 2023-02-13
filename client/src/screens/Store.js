@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import StoreCard from '../components/store/StoreCard';
 import UploadedProducts from '../components/product/UploadedProducts';
 import { fetchLoggedInUserStore } from '../reducers/storeSlice';
+import { clearProductMessages } from '../reducers/productSlice';
 import Spinner from '../components/layout/Spinner';
 
 const Store = () => {
@@ -13,13 +14,14 @@ const Store = () => {
         if (!store) {
             dispatch(fetchLoggedInUserStore());
         }
+        dispatch(clearProductMessages());
     },[dispatch, store]);
 
     if (loading) return <Spinner />;
     return (
         <div>
             <StoreCard store={store} message={msg} loading={photoLoading} />
-            <UploadedProducts />
+            <UploadedProducts storeId={ store ? store.store_id : 0 } />
         </div>
     )
 }

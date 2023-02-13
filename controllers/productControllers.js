@@ -9,7 +9,7 @@ const createProduct = async (req, res) => {
         return res.status(400).json({ errors: errors.array() });
     }
     // Destructure the parameters for the store creation from the body request
-    const { name, description, category, price, discount, features, specifications, images } = req.body;
+    const { name, description, category, price, discount, features, specifications, images, quantity } = req.body;
     try {
         // Fetch the user's store
         const store = await pool.query('SELECT * FROM store WHERE seller_id=$1',[req.user.id]);
@@ -54,7 +54,7 @@ const createProduct = async (req, res) => {
             product_features = [];
         }
         // Upload product
-        const result = await pool.query('INSERT INTO product (store_id, product_name, product_description, product_category, product_price, product_discount, product_images, product_features, product_specifications) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *', [
+        const result = await pool.query('INSERT INTO product (store_id, product_name, product_description, product_category, product_price, product_discount, product_images, product_features, product_specifications, product_quantity) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *', [
             store.rows[0].store_id,
             name,
             description,
@@ -63,7 +63,8 @@ const createProduct = async (req, res) => {
             parseFloat(discount).toFixed(2),
             newImages,
             product_features,
-            product_specifications
+            product_specifications,
+            parseInt(quantity)
         ]);
         if (result) {
             // Return success message
@@ -94,7 +95,7 @@ const updateProduct = async (req, res) => {
        return res.status(400).json({ errors: errors.array() });
    }
    // Destructure the parameters for the store creation from the body request
-   const { name, description, category, price, discount, features, specifications } = req.body;
+   const { name, description, category, price, discount, features, specifications, quantity } = req.body;
    try {
        // Fetch the user's store
        const store = await pool.query('SELECT * FROM store WHERE seller_id=$1', [req.user.id]);
@@ -136,24 +137,32 @@ const updateProduct = async (req, res) => {
        }
        // Check if the product features array was included in the request body and update the product_features object
        if (features) {
-           product_features = features.split(',').map(feature => feature.trim());
+           product_features = features;
        } else {
            product_features = product.rows[0].product_features;
        }
+       let product_quantity;
+       if (quantity) {
+        product_quantity = quantity;
+       } else {
+        product_quantity = product.rows[0].product_quantity;
+       }
        // Update product details
-       await pool.query('UPDATE product SET product_name=$1, product_description=$2, product_category=$3, product_price=$4, product_discount=$5, product_features=$6, product_specifications=$7 WHERE id=$8', [
-           name, description, category, price, discount, product_features, product_specifications, req.params.id
+       const result = await pool.query('UPDATE product SET product_name=$1, product_description=$2, product_category=$3, product_price=$4, product_discount=$5, product_features=$6, product_specifications=$7, product_quantity=$8 WHERE id=$9 RETURNING *', [
+           name, description, category, price, discount, product_features, product_specifications, product_quantity, req.params.id
        ]);
 
        // Return success message
        return res.status(201).json({
            msg: 'Your product data was updated successfully.',
            status: 'created',
-           status_code: '201'
+           status_code: '201',
+           data: result.rows[0]
        });
    } catch (error) {
        // Return error message if the remote services are unavailable
        if (error) {
+        console.log(error);
            return res.status(503).json({
                msg: 'We are unable to update your product details at the moment. Please try again later, thank you.',
                status: 'service unavailable',
@@ -318,13 +327,13 @@ const addImagesToProduct = async (req, res) => {
                 status_code: '401'
             });
         }
-        // Create an object containing that will hold the updated store images
+        // Create an array that will hold the updated store images
         const updatedImages = [...product.rows[0].product_images]
         let i;
         // Loop through the photos array and upload each photo
         for (i=0; i<photos.length; i++) {
             // upload each photo
-            const uploadPhoto = await cloudinary.v2.uploader.upload(photos[i], { folder: 'quickstore', resource_type: 'auto' });
+            const uploadPhoto = await cloudinary.v2.uploader.upload(photos[i].photo, { folder: 'quickstore', resource_type: 'auto' });
             // Create an upload object from each photo
             const photoObject = {
                 public_id: uploadPhoto.public_id,
@@ -334,21 +343,23 @@ const addImagesToProduct = async (req, res) => {
             updatedImages.push(photoObject);
         }
         // Update the product details
-        await pool.query('UPDATE product SET product_images=$1 WHERE id=$2', [updatedImages, req.params.product_id]);
+        const result = await pool.query('UPDATE product SET product_images=$1 WHERE id=$2 RETURNING *', [updatedImages, req.params.product_id]);
         // Check if the photos array length is greater than one
         if (photos.length > 1) {
             // Return success message for multiple image upload
             return res.status(201).json({
                 msg: 'You have successfully added images to this product.',
                 status: 'created',
-                status_code: '201'
+                status_code: '201',
+                data: result.rows[0].product_images
             });
         } else {
             // Return success message for single image upload
             return res.status(201).json({
                 msg: 'You have successfully added an image to this product.',
                 status: 'created',
-                status_code: '201'
+                status_code: '201',
+                data: result.rows[0].product_images
             });
         }
     } catch (error) {
@@ -400,17 +411,22 @@ const deleteProductPhoto = async (req, res) => {
             });
         }
         // Delete image from cloudinary cloud storage
-        await cloudinary.v2.uploader.destroy(public_id, { folder: 'quickstore' });
-        // Create new array containing the updated images
-        const updatedImages = product.rows[0].product_images.filter(item => item.public_id !== public_id);
-        // Update product details
-        await pool.query('UPDATE Product SET product_images=$1 WHERE id=$2', [updatedImages, product_id]);
-        // Return success message
-        return res.status(200).json({
-            msg: 'The product image was deleted successfully',
-            status: 'success',
-            status_code: '200'
-        });
+        const result = await cloudinary.v2.uploader.destroy(public_id, { folder: 'quickstore' });
+        if (result) {
+            // Create new array containing the updated images
+            const updatedImages = product.rows[0].product_images.filter(item => item.public_id !== public_id);
+            // Update product details
+            const updatedProduct = await pool.query('UPDATE Product SET product_images=$1 WHERE id=$2', [updatedImages, product_id]);
+            if (updatedProduct) {
+                // Return success message
+                return res.status(200).json({
+                    msg: 'The product image was deleted successfully',
+                    status: 'success',
+                    status_code: '200',
+                    id: public_id
+                });
+            }
+        }
     } catch (error) {
         // Return error if request fails
         if (error) {
@@ -459,13 +475,16 @@ const deleteProduct = async (req, res) => {
             }
         }
         // Delete the product from the database
-        await pool.query('DELETE FROM Product WHERE id=$1', [id]);
-        // Return success message
-        return res.status(200).json({
-            msg: 'Your product was deleted successfully.',
-            status: 'success',
-            status_code: '200'
-        });
+        const result = await pool.query('DELETE FROM Product WHERE id=$1', [id]);
+        if (result) {
+            // Return success message
+            return res.status(200).json({
+                msg: 'Your product was deleted successfully.',
+                status: 'success',
+                status_code: '200',
+                id
+            });
+        }
     } catch (error) {
         // Return error if request fails
         if (error) {

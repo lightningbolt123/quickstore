@@ -193,7 +193,7 @@ input[data-autocompleted] {
 .store-card {
   background-color: #ffffff;
   margin-top: 10px;
-  min-width: 40vw;
+  max-width: 45vw;
   padding: 10px;
   border-radius: 5px;
 }

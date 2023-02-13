@@ -78,9 +78,11 @@ const Product = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <td>{product.product_specifications.size}</td>
-                                <td>{product.product_specifications.color}</td>
-                                <td>{product.product_specifications.skin}</td>
+                                <tr>
+                                    <td>{product.product_specifications.size}</td>
+                                    <td>{product.product_specifications.color}</td>
+                                    <td>{product.product_specifications.skin}</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

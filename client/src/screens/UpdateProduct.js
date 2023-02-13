@@ -1,4 +1,5 @@
 import { useEffect, useState, Fragment } from 'react';
+import { useParams } from 'react-router-dom';
 import Button from '../components/layout/Button';
 import InputField from '../components/layout/InputField';
 import Header from '../components/layout/Header';
@@ -8,12 +9,11 @@ import { useNavigate } from 'react-router-dom';
 import FormAlert from '../components/layout/FormAlert';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping, faFileText, faDollar, faTag, faPlusCircle, faMinusCircle, faImages, faCheck, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { createProduct } from '../reducers/productSlice';
-import { clearProductMessages } from '../reducers/productSlice';
+import { updateProduct, addImageToProduct, removeImageFromProduct, getProduct, clearProductMessages } from '../reducers/productSlice';
 import { v4 as uuidv4 } from 'uuid';
 import { categories } from '../utils/staticVariables';
 
-const AddProduct = () => {
+const UpdateProduct = () => {
     const [ formData, setFormData ] = useState({
         name: '',
         description: '',
@@ -30,9 +30,10 @@ const AddProduct = () => {
     const [ photoImages, setPhotoImages ] = useState([]);
     const [ selectedOption, setSelectedOption ] = useState('');
 
-    const { msg, errors } = useSelector((state) => state.product);
+    const { msg, errors, product, loading } = useSelector((state) => state.product);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { id } = useParams();
 
     const { size, color, skin } = specificationsObject;
     const {
@@ -44,17 +45,14 @@ const AddProduct = () => {
     } = formData;
 
     useEffect(() => {
-        setSelectedOption(selectedOption);
+        if (JSON.stringify(product) === '{}') {
+            dispatch(getProduct(id));
+        }
 
-        if (msg.status_code === '200') {
-            dispatch(clearProductMessages());
-        } else if (msg.status_code === '201') {
+        if (typeof msg !== 'undefined' && msg.status_code === '201') {
             setTimeout(() => {
-                navigate("/store");
-            }, 2000);
-            setTimeout(() => {
-                navigate("/store");
-            },3000);
+                dispatch(clearProductMessages());
+            }, 3000);
         }
 
         if (errors.length > 0) {
@@ -62,7 +60,35 @@ const AddProduct = () => {
                 dispatch(clearProductMessages());
             },5000)
         }
-    },[dispatch, navigate, selectedOption, msg, errors]);
+    },[dispatch, navigate, id, selectedOption, msg, product, errors]);
+
+    useEffect(() => {
+        if (typeof product !== "undefined") {
+            setFormData({
+                name: typeof product.product_name !== "undefined" ? product.product_name : '',
+                description: typeof product.product_description !== "undefined" ? product.product_description : '',
+                price: typeof product.product_price !== "undefined" ? product.product_price : '',
+                discount: typeof product.product_discount !== "undefined" ? product.product_discount : '',
+                quantity: typeof product.product_quantity !== "undefined" ? product.product_quantity : ''
+            });
+        }
+        if (typeof product.product_features !== "undefined") {
+            setFeaturesArray([...product.product_features]);
+        }
+        if (typeof product.product_category !== "undefined") {
+            setSelectedOption(product.product_category);
+        }
+    },[product]);
+
+    useEffect(() => {
+        if (typeof product !== "undefined" && typeof product.product_specifications !== "undefined") {
+            setSpecificationsObject({
+                size: typeof product.product_specifications !== "undefined" ? product.product_specifications.size : '',
+                color: typeof product.product_specifications !== "undefined" ? product.product_specifications.color : '',
+                skin: typeof product.product_specifications !== "undefined" ? product.product_specifications.skin : ''
+            });
+        }
+    },[product]);
 
     const addImage = async (e) => {
        try {
@@ -89,6 +115,11 @@ const AddProduct = () => {
         e.preventDefault();
         const result = photoImages.filter((item) => item.id !== id);
         setPhotoImages([...result]);
+    }
+
+    const removeImageFromServer = (e, pId, imgId) => {
+        const data = { pId, imgId };
+        dispatch(removeImageFromProduct(data));
     }
 
     const addFeature = (e) => {
@@ -133,6 +164,7 @@ const AddProduct = () => {
 
     const onSubmit = (e) => {
         e.preventDefault();
+        // console.log(selectedOption)
         const data = {
             name,
             description,
@@ -141,16 +173,17 @@ const AddProduct = () => {
             specifications: specificationsObject,
             category: selectedOption,
             features: featuresArray,
-            images: photoImages,
             quantity
         };
-        // if (featuresArray) data.features = featuresArray;
-        // if (photoImages.length === 0) {
-        //     return alert('images cannot be empty!!!');
-        // } else {
-        //     data.images = photoImages;
-        // }
-        const result = dispatch(createProduct(data));
+        if (featuresArray) data.features = featuresArray;
+        if (photoImages.length === 0 && product.product_images.length === 0) {
+            return alert('images cannot be empty!!!');
+        } else if (photoImages.length > 0 && product.product_images.length === 0) {
+            dispatch(addImageToProduct({ id: product.id, data: photoImages }));
+        } else if (photoImages.length > 0 && product.product_images.length > 0) {
+            dispatch(addImageToProduct({ id: product.id, data: photoImages }));
+        }
+        const result = dispatch(updateProduct({ id: product.id, data }));
         if (result) {
             console.log(msg);
         }
@@ -160,7 +193,7 @@ const AddProduct = () => {
     return (
         <form onSubmit={(e) => onSubmit(e)} className='dashboard-form'>
             <Header text='Fill in your product details' />
-            {JSON.stringify(msg) !== '{}' ? (<FormAlert alert={msg} />) : ''}
+            {typeof msg !== 'undefined' && JSON.stringify(msg) !== '{}' ? (<FormAlert alert={msg} />) : ''}
             <InputField label='Name' type='text' name='name' value={name} error={getError('name')} changeHandler={onChange} icon={faCartShopping} />
             <InputField label='Description' type='text' name='description' value={description} error={getError('description')} changeHandler={onChange} icon={faFileText} />
             <InputField label='Price' type='number' name='price' value={price} error={getError('price')} changeHandler={onChange} icon={faDollar} />
@@ -170,8 +203,9 @@ const AddProduct = () => {
             <span className='medium-text'>Category</span>
             <div className='store-details-container'>
                 <select name='selectedOption' onChange={(e) => handleSelectOption(e)} style={{ marginTop: '10px', width: '100%', height: '50px' }}>
-                <option value='' disabled hidden>--Select an option--</option>
-                    {categories.map((category, index) => (
+                    {categories.map((category, index) => category === selectedOption ? (
+                        <option key={index} value={selectedOption} selected>{selectedOption.replace('_',' ').replace('&',' and ')}</option>
+                    ) : (
                         <option key={index} value={category}>{category.replace('_',' ').replace('&',' and ')}</option>
                     ))}
                 </select>
@@ -184,7 +218,7 @@ const AddProduct = () => {
             <br />
 
             <span className='medium-text'>Features</span>
-            {featuresArray.map(item => (
+            {featuresArray.length > 0 && featuresArray.map(item => (
                 <div key={item.id} className='store-details-container'>
                     <input type='text' value={item.text} onChange={(e) => featureOnChange(e, item.id)} style={specStyle} className='feature-input-div' placeholder='feature'  />
                     <FontAwesomeIcon icon={faMinusCircle} onClick={(e) => removeFeature(e, item.id)} style={{ marginTop: '15px', color: '#F55050' }} className='clickable-icon-style' size='2x' />                    
@@ -200,6 +234,17 @@ const AddProduct = () => {
             </div>
 
             <span className='medium-text'>Images</span><br />
+
+            <div className='store-details-container'>
+                {typeof product.product_features !== "undefined" && product.product_images.map(item => (
+                    <div key={item.public_id} style={{ marginTop: '10px' }} className='store-card-details'>
+                        <img src={item.secure_url} style={{ width: '90%', height: '250px', borderRadius: '10px', opacity: '1.0' }} alt='product placeholder' /><br />
+                        <FontAwesomeIcon icon={faTrash} onClick={(e) => removeImageFromServer(e, product.id, item.public_id)} style={{ marginTop: '15px', color: '#F55050' }} className='clickable-icon-style' size='2x' />
+                    </div>
+                ))}
+            </div>
+
+            <span className='medium-text'>Add images</span><br />
 
             <div style={{ textAlign: 'center', width: '100%', marginTop: '10px', marginBottom: '10px' }}>
                 {errors && errors.map(error => error.param === 'images' ? (
@@ -238,4 +283,4 @@ const specStyle = {
     padding: '10px'
 }
 
-export default AddProduct;
+export default UpdateProduct;
