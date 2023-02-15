@@ -147,7 +147,7 @@ export const photoUpload = createAsyncThunk(
 // The initial state of the reducer
 const initialState = {
     token: localStorage.getItem("token"),
-    isAuthenticated: false,
+    isAuthenticated: !!localStorage.getItem("token"),
     loading: false,
     message: {},
     errors: [],

@@ -30,7 +30,7 @@ const AddProduct = () => {
     const [ photoImages, setPhotoImages ] = useState([]);
     const [ selectedOption, setSelectedOption ] = useState('');
 
-    const { msg, errors } = useSelector((state) => state.product);
+    const { msg, errors, loading } = useSelector((state) => state.product);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -151,10 +151,6 @@ const AddProduct = () => {
         //     data.images = photoImages;
         // }
         const result = dispatch(createProduct(data));
-        if (result) {
-            console.log(msg);
-        }
-        console.log(data);
     }
 
     return (
@@ -222,7 +218,7 @@ const AddProduct = () => {
             </label>
             <input type='file' id='add-image' onChange={(e) => addImage(e)} style={{ display: 'none' }} />
             
-            <Button text='SUBMIT' icon={faCheck} />
+            <Button text='SUBMIT' loading={loading} icon={faCheck} />
 
             
         </form>

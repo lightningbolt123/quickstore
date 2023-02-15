@@ -149,7 +149,7 @@ router.post('/cart', [
 // @Access  Private
 router.get('/cart', auth, cartControllers.getCart);
 
-// @Route   DELETE api/store/cart
+// @Route   DELETE api/store/cart/:id
 // @Desc    Route for removing product from cart
 // @Access  Private
 router.delete('/cart/:id', auth, cartControllers.removeItemFromCart);

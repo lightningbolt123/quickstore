@@ -11,7 +11,7 @@ const Store = () => {
     const { store, loading, photoLoading, msg } = useSelector((state) => state.store);
 
     useEffect(() => {
-        if (!store) {
+        if (store === null) {
             dispatch(fetchLoggedInUserStore());
         }
         dispatch(clearProductMessages());

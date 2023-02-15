@@ -7,13 +7,15 @@ import FormAlert from '../layout/FormAlert';
 import { photoUpload } from '../../reducers/authSlice';
 import { clearMessages } from '../../reducers/authSlice';
 
-const ProfilePicture = ({ photo, message }) => {
+const ProfilePicture = ({ user, message }) => {
     const [ picture, setPicture ] = useState('');
     const dispatch = useDispatch();
 
     useEffect(() => {
-        setPicture(photo);
-    },[photo]);
+        if (user.photo.secure_url) {
+            setPicture(user.photo.secure_url);
+        }
+    },[user.photo.secure_url]);
 
     const onChange = (e) => {
         const file = e.target.files[0];
@@ -47,7 +49,7 @@ const ProfilePicture = ({ photo, message }) => {
 
 ProfilePicture.propTypes = {
     message: PropTypes.object,
-    photo: PropTypes.string
+    user: PropTypes.object
 }
 
 const imageStyle = {

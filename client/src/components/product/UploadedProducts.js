@@ -6,10 +6,10 @@ import SmallButton from '../layout/SmallButton';
 import Header from '../layout/Header';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTrashAlt, faEdit } from '@fortawesome/free-solid-svg-icons';
-import { getVendorProducts } from '../../reducers/productSlice';
+import { getVendorProducts, deleteProductFromStore, clearProductMessages } from '../../reducers/productSlice';
 
 const UploadedProducts = ({ storeId }) => {
-    const { products } = useSelector((state) => state.product);
+    const { products, msg } = useSelector((state) => state.product);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -17,6 +17,12 @@ const UploadedProducts = ({ storeId }) => {
             dispatch(getVendorProducts(storeId));
         }
     },[dispatch, storeId]);
+
+    const removeProduct = (e, id) => {
+        e.preventDefault();
+        dispatch(deleteProductFromStore(id));
+    }
+
     return (
         <div style={{ overflowX: 'scroll', overflowY: 'auto' }} className='store-card'>
             <Header text='My products' />
@@ -45,7 +51,7 @@ const UploadedProducts = ({ storeId }) => {
                             <td>{product.product_discount}</td>
                             <td>{product.product_quantity}</td>
                             <td>
-                                <FontAwesomeIcon style={{ color: '#F55050', marginRight: '10px' }} className='clickable-icon-style' icon={faTrashAlt} />
+                                <FontAwesomeIcon onClick={(e) => removeProduct(e, product.id)} style={{ color: '#F55050', marginRight: '10px' }} className='clickable-icon-style' icon={faTrashAlt} />
                                 <Link className='remove-link-style' to={`/update-product/${product.id}`}>
                                     <FontAwesomeIcon style={{ color: 'rgba(16, 121, 240, 0.8)', marginRight: '10px' }} className='clickable-icon-style' icon={faEdit} />
                                 </Link>

@@ -42,13 +42,13 @@ function App() {
           <Route path="/products/:id" element={<Product />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<PrivateRoute component={Dashboard} />} />
-          <Route path="/settings" element={<PrivateRoute component={Settings} />} />
-          <Route path="/store" element={<PrivateRoute component={Store} />} />
-          <Route path="/create-store" element={<PrivateRoute component={CreateOrUpdateStore} />} />
-          <Route path="/update-store" element={<PrivateRoute component={CreateOrUpdateStore} />} />
-          <Route path="/add-product" element={<PrivateRoute component={AddProduct} />} />
-          <Route path="/update-product/:id" element={<PrivateRoute component={UpdateProduct} />} />
+          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
+          <Route path="/store" element={<PrivateRoute><Store /></PrivateRoute>} />
+          <Route path="/create-store" element={<PrivateRoute><CreateOrUpdateStore /></PrivateRoute>} />
+          <Route path="/update-store" element={<PrivateRoute><CreateOrUpdateStore /></PrivateRoute>} />
+          <Route path="/add-product" element={<PrivateRoute ><AddProduct /></PrivateRoute>} />
+          <Route path="/update-product/:id" element={<PrivateRoute><UpdateProduct /></PrivateRoute>} />
         </Routes>
       </div>
       <Footer />

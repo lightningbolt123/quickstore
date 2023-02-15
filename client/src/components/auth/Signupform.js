@@ -87,9 +87,9 @@ const SignupForm = ({ errors, loading, message }) => {
                 setPasswordError(current => !current);
             },3000)
         }
-        setTimeout(() => {
-            dispatch(clearMessages());
-        },3000);
+        // setTimeout(() => {
+        //     dispatch(clearMessages());
+        // },3000);
     }
 
     return (

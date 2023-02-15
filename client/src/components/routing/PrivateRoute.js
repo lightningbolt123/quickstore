@@ -2,13 +2,12 @@ import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../layout/Spinner';
-import { loadUser } from '../../reducers/authSlice';
 
-const PrivateRoute = ({ children, component: Component }) => {
+const PrivateRoute = ({ children }) => {
     const { loading, isAuthenticated } = useSelector((state) => state.auth);
   
     if (loading) return <Spinner />
-    if (isAuthenticated) return <Component />
+    if (!isAuthenticated) return <Navigate to='/login' />
     return children;
 }
 

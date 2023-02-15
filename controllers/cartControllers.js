@@ -19,7 +19,14 @@ const addItemToCart = async (req, res) => {
             return res.status(401).json({
                 msg: 'You need to have an account on our platform to use this feature. Please sign up from the menu.',
                 status: 'unauthorized',
-                status_code: '401'
+                status_code: '401',
+                data: {
+                    productname,
+                    productimage,
+                    productprice,
+                    productquantity,
+                    productid
+                }
             });
         }
         // Create new cart item
@@ -125,7 +132,8 @@ const removeItemFromCart = async (req, res) => {
         return res.status(200).json({
             msg: 'You have successfully removed an item from your cart.',
             status: 'success',
-            status_code: '200'
+            status_code: '200',
+            id: req.params.id
         });
     } catch (error) {
         // Return error if request fails

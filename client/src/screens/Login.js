@@ -45,7 +45,7 @@ const Login = () => {
         },3000);
     }
 
-    if (loading) return <Spinner />
+    // if (loading) return <Spinner />
 
     if (isAuthenticated) return <Navigate to="/dashboard" />
     

@@ -225,7 +225,7 @@ export const productSlice = createSlice({
             state.loading = false;
             const { id, ...rest } = payload;
             state.msg = rest;
-            state.products.filter(product => product.id !== parseInt(id));
+            state.products = state.products.filter(product => product.id !== parseInt(id));
         });
         builder.addCase(deleteProductFromStore.rejected, (state, { payload }) => {
             state.loading = false;

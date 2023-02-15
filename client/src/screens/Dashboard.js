@@ -2,6 +2,8 @@ import { Fragment, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { faHeart, faGear, faList, faStore, faFileInvoice, faBuildingColumns } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useSelector, useDispatch } from 'react-redux';
+import { loadUser } from '../reducers/authSlice';
 
 const links = [
     {
@@ -42,6 +44,16 @@ const links = [
 ]
 
 const Dashboard = () => {
+    const { isAuthenticated, user, message } = useSelector((state) => state.auth);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (isAuthenticated && user === null) {
+            dispatch(loadUser());
+        }
+    }, [dispatch, isAuthenticated, user]);
+
     return (
         <Fragment>
             <div className='dashboard-container'>

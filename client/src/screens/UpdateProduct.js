@@ -49,6 +49,10 @@ const UpdateProduct = () => {
             dispatch(getProduct(id));
         }
 
+        if (typeof msg !== 'undefined' && msg.status_code === '200') {
+            dispatch(clearProductMessages());
+        }
+
         if (typeof msg !== 'undefined' && msg.status_code === '201') {
             setTimeout(() => {
                 dispatch(clearProductMessages());
@@ -206,7 +210,7 @@ const UpdateProduct = () => {
                     {categories.map((category, index) => category === selectedOption ? (
                         <option key={index} value={selectedOption} selected>{selectedOption.replace('_',' ').replace('&',' and ')}</option>
                     ) : (
-                        <option key={index} value={category}>{category.replace('_',' ').replace('&',' and ')}</option>
+                        <option key={index} value={category}>{category.replace('_',' ').replace('&',' and ').replace('_',' ')}</option>
                     ))}
                 </select>
             </div>
@@ -267,7 +271,7 @@ const UpdateProduct = () => {
             </label>
             <input type='file' id='add-image' onChange={(e) => addImage(e)} style={{ display: 'none' }} />
             
-            <Button text='SUBMIT' icon={faCheck} />
+            <Button text='SUBMIT' loading={loading} icon={faCheck} />
 
             
         </form>
