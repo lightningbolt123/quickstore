@@ -20,6 +20,7 @@ export const addToCart = createAsyncThunk(
             const response = await cartAPI.addToCartAPI(data);
             return response.data;
         } catch (error) {
+            console.log(error.response.data);
             return rejectWithValue(error.response.data);
         }
     }
@@ -39,14 +40,20 @@ export const removeFromCart = createAsyncThunk(
 
 const initialState = {
     cart: [],
-    msg: {},
+    cartMessage: {},
+    errors: [],
     loading: false
 };
 
 const cartSlice = createSlice({
     name: "cart",
     initialState,
-    reducers: {},
+    reducers: {
+        clearCartMessages: (state) => {
+            state.cartMessage = {};
+            state.errors = [];
+        }
+    },
     extraReducers: (builder) => {
         builder.addCase(getCart.pending, (state, { payload }) => {
             state.loading = true;
@@ -57,31 +64,38 @@ const cartSlice = createSlice({
         });
         builder.addCase(getCart.rejected, (state, { payload }) => {
             state.loading = false;
-            state.msg = payload;
+            state.cartMessage = payload;
         });
         builder.addCase(addToCart.pending, (state, { payload }) => {
             state.loading = true;
         });
         builder.addCase(addToCart.fulfilled, (state, { payload }) => {
             state.loading = false;
-            state.cart = state.cart.push(payload.data);
+            const { data, ...rest} = payload;
+            state.cartMessage = rest;
+            if (data) state.cart.push(data);
         });
         builder.addCase(addToCart.rejected, (state, { payload }) => {
             state.loading = false;
-            state.msg = payload;
+            if (payload.errors) {
+                state.errors = payload.errors;
+            } else {
+                state.cartMessage = payload;
+            }
         });
         builder.addCase(removeFromCart.pending, (state, { payload }) => {
             state.loading = true;
         });
         builder.addCase(removeFromCart.fulfilled, (state, { payload }) => {
             state.loading = false;
-            state.cart = state.cart.filter(item => item.productid !== payload.id);
+            state.cart = state.cart.filter(item => item._id !== payload.id);
         });
         builder.addCase(removeFromCart.rejected, (state, { payload }) => {
             state.loading = false;
-            state.msg = payload;
+            state.cartMessage = payload;
         });
     }
 });
 
+export const { clearCartMessages } = cartSlice.actions;
 export default cartSlice.reducer;

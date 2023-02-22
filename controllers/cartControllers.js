@@ -10,6 +10,7 @@ const addItemToCart = async (req, res) => {
     }
     // Destructure the request body
     const { productname, productimage, productprice, productquantity, productid } = req.body;
+    const total = parseInt(productprice) * parseInt(productquantity)
     try {
         // Fetch the user from the database
         const user = await User.findById(req.user.id);
@@ -19,34 +20,45 @@ const addItemToCart = async (req, res) => {
             return res.status(401).json({
                 msg: 'You need to have an account on our platform to use this feature. Please sign up from the menu.',
                 status: 'unauthorized',
-                status_code: '401',
-                data: {
-                    productname,
-                    productimage,
-                    productprice,
-                    productquantity,
-                    productid
-                }
+                status_code: '401'
             });
         }
-        // Create new cart item
-        const item = new Cart({
-            user: req.user.id,
+        const cartItem = {
             productname,
             productimage,
             productprice,
-            productquantity,
-            productid
-        });
-        // Save cart item
-        await item.save()
+            quantity: productquantity,
+            productid,
+            total
+        };
+        // Fetch user cart
+        let cart = await Cart.findOne({ user: req.user.id });
+        if (!cart) {
+            cart = new Cart({
+                user: req.user.id,
+                items: [cartItem]
+            });
+        } else if (cart && cart.items.filter(item => item.productid === productid).length > 0) {
+            return res.status(200).json({
+                msg: 'This item has already been added to your cart.',
+                status: 'success',
+                status_code: '200'
+            });
+        } else {
+            cart.items.push(cartItem);
+        }
+        // Save cart
+        await cart.save();
+        // create data object
+        const data = cart.items.find(item => parseInt(item.productid) === parseInt(productid));
         // Return success message
         return res.status(200).json({
             status: 'success',
             status_code: '200',
-            data: item
+            data
         });
     } catch (error) {
+        console.log(error);
         // Return error if request fails
         if (error) {
             return res.status(503).json({
@@ -71,9 +83,9 @@ const getCart = async (req, res) => {
             });
         }
         // Get cart
-        const cart = await Cart.find({ user: req.user.id });
+        const cart = await Cart.findOne({ user: req.user.id });
         // Check if cart exists
-        if (!cart) {
+        if (!cart || cart.items.length === 0) {
             return res.status(200).json({
                 status: 'success',
                 status_code: '200',
@@ -84,7 +96,7 @@ const getCart = async (req, res) => {
         return res.status(200).json({
             status: 'success',
             status_code: '200',
-            data: cart
+            data: cart.items
         });
     } catch (error) {
         // Return error if request fails
@@ -111,24 +123,18 @@ const removeItemFromCart = async (req, res) => {
             });
         }
         // Fetch the cart item
-        const item = await Cart.findById(req.params.id);
-        // Check if the cart item exists
-        if (!item) {
+        const cart = await Cart.findOne({ user: req.user.id });
+        // Check if the item exists in the user cart
+        if (cart.items.filter(item => item._id.toString() === req.params.id).length === 0) {
             return res.status(404).json({
-                msg: 'The item you are trying to delete from your cart does not exist.',
+                msg: 'This item is not in your cart.',
                 status: 'not found',
-                status_code: '404'
+                status_code: '404',
             });
         }
-        // Check if the logged in user is the owner of the cart
-        if (item.user.toString() !== req.user.id) {
-            return res.status(401).json({
-                msg: 'You are not allowed to delete this itme from the cart because you are not the owner of the cart.',
-                status: 'unauthorized',
-                status_code: '401'
-            })
-        }
-        await item.remove();
+        const removeIndex = cart.items.map(item => item._id.toString()).indexOf(req.params.id);
+        cart.items.splice(removeIndex, 1);
+        await cart.save();
         return res.status(200).json({
             msg: 'You have successfully removed an item from your cart.',
             status: 'success',

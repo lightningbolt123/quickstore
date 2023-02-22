@@ -31,7 +31,7 @@ const Navigator = () => {
             {isAuthenticated ? (
                 <Fragment>
                     <Link to='/dashboard' className='remove-link-style'><li>Dashboard</li></Link>
-                    <li>cart</li>
+                    <Link to='/cart' className='remove-link-style'><li>Cart</li></Link>
                     <li>wishlist</li>
                     <li style={{ cursor: 'pointer' }} onClick={logoutUser}>Logout</li>
                 </Fragment>

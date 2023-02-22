@@ -6,23 +6,30 @@ const CartSchema = new mongoose.Schema({
         ref: 'user',
         required: true
     },
-    productname: {
-        type: String,
-        required: true
-    },
-    productid: {
-        type: Number,
-        required: true
-    },
-    productimage: {
-        type: String
-    },
-    productprice: {
-        type: Number
-    },
-    quantity: {
-        type: Number
-    },
+    items: [
+        {
+            productname: {
+                type: String,
+                required: true
+            },
+            productid: {
+                type: Number,
+                required: true
+            },
+            productimage: {
+                type: String
+            },
+            productprice: {
+                type: Number
+            },
+            quantity: {
+                type: Number
+            },
+            total: {
+                type: Number
+            }
+        }
+    ],
     date: {
         type: Date,
         default: Date.now

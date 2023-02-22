@@ -147,7 +147,7 @@ export const productSlice = createSlice({
         builder.addCase(createProduct.fulfilled, (state, { payload }) => {
             state.loading = false;
             const { data, ...rest } = payload;
-            state.products.unshift(data);
+            state.products = state.products.unshift(data);
             state.msg = rest;
         });
         builder.addCase(createProduct.rejected, (state, { payload }) => {

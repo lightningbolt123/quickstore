@@ -1,5 +1,5 @@
 import headerConfig from "../utils/headerConfig";
-import setAuthToken from "../utils/headerConfig";
+import setAuthToken from "../utils/setAuthToken";
 import axios from 'axios';
 
 const addToCartAPI = async (data) => {
@@ -23,7 +23,7 @@ const removeItemFromCartAPI = async (id) => {
     if (token) {
         setAuthToken(token);
     }
-    return axios.get(`http://localhost:5000/api/store/cart/${id}`, headerConfig);
+    return axios.delete(`http://localhost:5000/api/store/cart/${id}`, headerConfig);
 }
 
 export const cartAPI = {

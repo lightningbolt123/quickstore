@@ -4,6 +4,7 @@ import { faHeart, faGear, faList, faStore, faFileInvoice, faBuildingColumns } fr
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadUser } from '../reducers/authSlice';
+import { getCart } from '../reducers/cartSlice';
 
 const links = [
     {
@@ -51,6 +52,7 @@ const Dashboard = () => {
     useEffect(() => {
         if (isAuthenticated && user === null) {
             dispatch(loadUser());
+            dispatch(getCart());
         }
     }, [dispatch, isAuthenticated, user]);
 

@@ -18,6 +18,7 @@ import Store from './screens/Store';
 import CreateOrUpdateStore from './screens/CreateOrUpdateStore';
 import AddProduct from './screens/AddProduct';
 import UpdateProduct from './screens/UpdateProduct';
+import Cart from './screens/Cart';
 
 const token = localStorage.getItem("token");
 if (token) {
@@ -43,6 +44,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/cart" element={<PrivateRoute><Cart /></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
           <Route path="/store" element={<PrivateRoute><Store /></PrivateRoute>} />
           <Route path="/create-store" element={<PrivateRoute><CreateOrUpdateStore /></PrivateRoute>} />
