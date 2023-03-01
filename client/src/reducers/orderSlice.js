@@ -144,13 +144,12 @@ export const orderSlice = createSlice({
         });
         builder.addCase(updateInvoice.fulfilled, (state, { payload }) => {
             state.loading = false;
-            const { msg, status, status_code, order_status, id, item_id } = payload;
-            state.msg = { msg, status, status_code };
-            state.invoice.goodspurchased.map(good => good._id.toString() === item_id ? {...good, status: order_status } : good);
+            state.message = payload;
+            state.invoice = state.invoice.goodspurchased.map(item => item._id === payload.item_id ? {...item, status: payload.order_status } : item);
         });
         builder.addCase(updateInvoice.rejected, (state, { payload }) => {
             state.loading = false;
-            state.msg = payload;
+            state.message = payload;
         });
     }
 });

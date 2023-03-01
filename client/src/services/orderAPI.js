@@ -31,7 +31,7 @@ export const getInvoice = (id) => {
     if (token) {
         setAuthToken(token);
     }
-    return axios.get(`http://localhost:5000/api/orders/invoice/${id}`);
+    return axios.get(`http://localhost:5000/api/orders/invoice/${id}`, headerConfig);
 }
 
 export const updateInvoiceStatus = (id, item_id, data) => {
@@ -39,7 +39,7 @@ export const updateInvoiceStatus = (id, item_id, data) => {
     if (token) {
         setAuthToken(token);
     }
-    return axios.put(`http://localhost:5000/api/orders/${id}/${item_id}`, JSON.stringify(data), headerConfig);
+    return axios.put(`http://localhost:5000/api/orders/${id}/${item_id}`, JSON.stringify({ newstatus: data }), headerConfig);
 }
 
 export const orderAPI = {

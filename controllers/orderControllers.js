@@ -191,12 +191,13 @@ const updateOrderStatus = async (req, res) => {
                 status_code: '404'
             });
         }
-        if (newstatus !== 'received' || newstatus !== 'cancelled' || newstatus !== 'processing') {
+        const statuses = ['received','cancelled','processing']
+        if (statuses.filter(stat => stat === newstatus).length === 0) {
             return res.status(400).json({
                 msg: 'Wrong purchase status detected.',
                 status: 'bad request',
                 status_code: '400'
-            })
+            });
         }
         // Get order object
         const orderObject = order.goodspurchased.find(item => item._id.toString() === item_id);
