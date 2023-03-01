@@ -30,12 +30,7 @@ const OrderSchema = new mongoose.Schema({
                 default: 'processing'
             },
             storeid: {
-                type: Number,
-                required: true
-            },
-            storename: {
-                type: String,
-                required: true
+                type: Number
             },
             productname: {
                 type: String,

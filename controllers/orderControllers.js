@@ -3,6 +3,7 @@ const pool = require('../utils/pool');
 const { v4: uuidv4 } = require('uuid');
 const User = require('../models/User');
 const Order = require('../models/Order');
+const Cart = require('../models/Cart');
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require('twilio')(accountSid, authToken);
@@ -69,9 +70,9 @@ const placeOrder = async (req, res) => {
             });
         }
         // Get firstname, lastname, and email from user object
-        const { firstname, lastname, email } = user;
+        const { firstname, lastname } = user;
         // Create customer phone number
-        const phone = `+${user.countrycode}${user.phonenumber}`
+        const phone = user.phonenumber;
         // Create reference number
         const reference = uuidv4();
         // Process card payment
@@ -97,7 +98,7 @@ const placeOrder = async (req, res) => {
         // Check if card expirydate is valid
         if (cardExpiryDateIsValid.length === 0) {
             return res.status(400).json({
-                msg: 'The card cvv you typed in is invalid. Please type in the correct cvv.',
+                msg: 'The card cvv you typed in is invalid. Please type in the correct expiry date.',
                 status: 'bad request',
                 status_code: '400'
             });
@@ -134,12 +135,19 @@ const placeOrder = async (req, res) => {
             customerphone: phone,
             goodspurchased: items
         });
-        await order.save();
+
+        // Empty the user's cart once the request is successfully
+        const response = await order.save();
+        if (response) {
+            await Cart.findOneAndUpdate({ user: req.user.id }, { $set: { items: [] } }, { new: true });
+        }
+
         // Return success response
         return res.status(200).json({
             msg: 'Your purchase was successful and your order is being processed at the moment. You have to confirm that you have received your good while it is been handed over to you to complete your transaction. Thank you for using quickstore.',
             status: 'success',
-            status_code: '200'
+            status_code: '200',
+            data: order
         });
     } catch (error) {
         // Check for server error
@@ -199,7 +207,7 @@ const updateOrderStatus = async (req, res) => {
         // Get the vendor wallet
         const wallet = await pool.query('SELECT * FROM wallet WHERE store_id=$1',[orderObject.storeid]);
         // Check status
-        if (newstatus === 'received' && orderObject.status !== 'received') {
+        if (newstatus === 'received' && orderObject.status === 'processing') {
             // Create new available balance and ledger balance
             const availableBalance = wallet.rows[0].available_balance + parseFloat(orderObject.cost);
             const ledgerBalance = wallet.rows[0].ledger_balance - parseFloat(orderObject.cost);
@@ -208,9 +216,11 @@ const updateOrderStatus = async (req, res) => {
             return res.status(200).json({
                 msg: 'You have successfully confirmed the receival of this product.',
                 status: 'success',
-                status_code: '200'
+                status_code: '200',
+                order_status: 'received',
+                item_id
             });
-        } else if (newstatus === 'cancelled' && orderObject.status !== 'cancelled') {
+        } else if (newstatus === 'cancelled' && orderObject.status === 'processing') {
             let goods;
             if (order.goodspurchased.length > 1) {
                 goods = 'items';
@@ -231,13 +241,17 @@ const updateOrderStatus = async (req, res) => {
             return res.status(200).json({
                 msg: 'Your have successfully cancelled this order and your funds are been processed.',
                 status: 'success',
-                status_code: '200'
+                status_code: '200',
+                order_status: 'cancelled',
+                item_id
             });
-        } else if (orderObject.status !== 'received' || orderObject.status !== 'cancelled') {
+        } else if (orderObject.status !== 'processing') {
             return res.status(200).json({
                 msg: 'You have already confirmed this order.',
                 status: 'success',
-                status_code: '200'
+                status_code: '200',
+                order_status: orderObject.status,
+                item_id
             });
         }
     } catch (error) {
@@ -245,6 +259,54 @@ const updateOrderStatus = async (req, res) => {
         if (error) {
             return res.status(503).json({
                 msg: 'We encountered an error while confirming your order. Please try again later, thank you.',
+                status: 'service unavailable',
+                status_code: '503'
+            });
+        }
+    }
+}
+
+// Controller for getting a single order
+const getInvoice = async (req, res) => {
+    try {
+        // Get user account
+        const user = await User.findById(req.user.id);
+        // Check if user account exists
+        if (!user) {
+            return res.status(401).json({
+                msg: 'You are not authorized to make use of this feature.',
+                status: 'unauthorized',
+                status_code: '401'
+            });
+        }
+        // Fetch the invoice for the account
+        const invoice = await Order.findById(req.params.id);
+        if (!invoice) {
+            return res.status(404).json({
+                msg: 'Invoice not found.',
+                status: 'not found',
+                status_code: '404'
+            });
+        }
+        // Check if the customer id is the same as the logged in user id
+        if (invoice.customerid.toString() !== req.user.id) {
+            return res.status(401).json({
+                msg: 'You are not authorized to view this invoice.',
+                status: 'unauthorized',
+                status_code: '401'
+            });
+        }
+        // Return response
+        return res.status(200).json({
+            status: 'success',
+            status_code: '200',
+            data: invoice
+        });
+    } catch (error) {
+        // Return error if error exists
+        if (error) {
+            return res.status(503).json({
+                msg: 'Sorry we are unable to get your orders at the moment. Please try again later, thank you.',
                 status: 'service unavailable',
                 status_code: '503'
             });
@@ -379,5 +441,6 @@ module.exports = {
     updateOrderStatus,
     getOrders,
     getPurchaseHistory,
-    userIsVendor
+    userIsVendor,
+    getInvoice
 };

@@ -38,20 +38,7 @@ const CreateOrUpdateStore = () => {
             dispatch(clearMessages());
             navigate('/store');
         }
-        if (!store) {
-            const result = dispatch(fetchLoggedInUserStore());
-            if (result) {
-                setFormData({
-                    name: store? store.name : '',
-                    shop_url: store? store.shop_url : '',
-                    house: store? store.house : '',
-                    street: store? store.street : '',
-                    postalcode: store? store.postalcode : '',
-                    city: store? store.city : '',
-                    country: store? store.country : ''
-                });
-            }
-        } else {
+        if (store) {
             setFormData({
                 name: store? store.name : '',
                 shop_url: store? store.shop_url : '',

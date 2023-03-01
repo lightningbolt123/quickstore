@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 
-const StoreDetailItem = ({ data, label }) => {
+const StoreDetailItem = ({ data='', label='' }) => {
     return (
         <p>
             <span style={{ float: 'left', fontWeight: 'bold' }}>{label}</span>

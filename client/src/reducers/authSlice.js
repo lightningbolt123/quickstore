@@ -192,10 +192,10 @@ export const authSlice = createSlice({
             state.isAuthenticated = true;
         });
         builder.addCase(loginUser.rejected, (state, { payload }) => {
-            if (payload.errors.length === 1) {
+            if (payload.errors && payload.errors.length === 1) {
                 state.message = payload.errors[0];
             } else {
-                state.errors = payload.errors;
+                state.message = payload;
             }
             state.loading = false;
             state.isAuthenticated = false;

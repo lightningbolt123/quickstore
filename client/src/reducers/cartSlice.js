@@ -49,6 +49,9 @@ const cartSlice = createSlice({
     name: "cart",
     initialState,
     reducers: {
+        clearCart: (state) => {
+            state.cart = [];
+        },
         clearCartMessages: (state) => {
             state.cartMessage = {};
             state.errors = [];
@@ -97,5 +100,5 @@ const cartSlice = createSlice({
     }
 });
 
-export const { clearCartMessages } = cartSlice.actions;
+export const { clearCartMessages, clearCart } = cartSlice.actions;
 export default cartSlice.reducer;

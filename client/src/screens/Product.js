@@ -33,6 +33,7 @@ const Product = () => {
             productname: product.product_name,
             productimage: product.product_images[0].secure_url,
             productprice: product.new_price,
+            storeid: product.store_id,
             productquantity: quantity
         };
         dispatch(addToCart(data));

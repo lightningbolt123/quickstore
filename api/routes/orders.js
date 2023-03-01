@@ -33,6 +33,11 @@ router.put('/:id/:item_id', [
 // @Access  Private
 router.get('/vendororders', auth, orderControllers.getOrders);
 
+// @Route   GET api/orders/invoice/:id
+// @Desc    Route for getting a single invoice
+// @Access  Private
+router.get('/invoice/:id', auth, orderControllers.getInvoice);
+
 // @Route   GET api/orders/purchasehistory
 // @Desc    Route for getting the purchase history of the logged in user
 // @Access  Private

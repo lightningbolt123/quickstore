@@ -5,6 +5,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadUser } from '../reducers/authSlice';
 import { getCart } from '../reducers/cartSlice';
+import { getInvoices } from '../reducers/orderSlice';
+import Header from '../components/layout/Header';
+import formatDate from '../utils/formatDate';
+import StoreDetailItem from '../components/layout/StoreDetailItem';
 
 const links = [
     {
@@ -46,6 +50,7 @@ const links = [
 
 const Dashboard = () => {
     const { isAuthenticated, user, message } = useSelector((state) => state.auth);
+    const { invoices } = useSelector((state) => state.order);
 
     const dispatch = useDispatch();
 
@@ -56,10 +61,14 @@ const Dashboard = () => {
         }
     }, [dispatch, isAuthenticated, user]);
 
+    useEffect(() => {
+        dispatch(getInvoices());
+    },[dispatch]);
+
     return (
         <Fragment>
             <div className='dashboard-container'>
-                <h1>Dashboard</h1>
+                <Header text='Dashboard' />
                 <div className='dashboard-nav'>
                     {links.map(link => (
                         <div key={link.id} style={{ width: '150px', height:'150px', marginTop: '10px' }}>
@@ -69,8 +78,30 @@ const Dashboard = () => {
                     ))}
                 </div>
             </div>
-            <div className='dashboard-container'>
-                <h1>Hello</h1>
+            <div style={{ overflowX: 'scroll', overflowY: 'auto' }} className='invoice'>
+                <Header text='Invoice history' />
+                <table style={{ marginTop: '5px' }}>
+                    <thead>
+                        <tr>
+                            <th>Serial#</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Invoice ID</th>
+                            <th>Number of items</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {invoices.map((invoice, index) => (
+                            <tr key={invoice._id}>
+                                <td>{index + 1}</td>
+                                <td>{formatDate(invoice.date)}</td>
+                                <td>{new Date(invoice.date).toLocaleTimeString()}</td>
+                                <td style={{ color: '#1483b8' }}><Link to={`/invoice/${invoice._id}`} className='remove-link-style'>{invoice._id}</Link></td>
+                                <td>{invoice.goodspurchased.length}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
         </Fragment>
     );

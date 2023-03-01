@@ -9,7 +9,7 @@ const addItemToCart = async (req, res) => {
         return res.status(400).json({ errors: errors.array() });
     }
     // Destructure the request body
-    const { productname, productimage, productprice, productquantity, productid } = req.body;
+    const { productname, productimage, productprice, productquantity, productid, storeid } = req.body;
     const total = parseInt(productprice) * parseInt(productquantity)
     try {
         // Fetch the user from the database
@@ -29,6 +29,7 @@ const addItemToCart = async (req, res) => {
             productprice,
             quantity: productquantity,
             productid,
+            storeid,
             total
         };
         // Fetch user cart
@@ -53,6 +54,7 @@ const addItemToCart = async (req, res) => {
         const data = cart.items.find(item => parseInt(item.productid) === parseInt(productid));
         // Return success message
         return res.status(200).json({
+            msg: 'Item added to cart successfully.',
             status: 'success',
             status_code: '200',
             data
