@@ -21,7 +21,7 @@ const Store = () => {
     return (
         <div>
             <StoreCard store={store} message={msg} loading={photoLoading} />
-            <UploadedProducts storeId={ store ? store.store_id : 0 } />
+            <UploadedProducts storeId={ store ? store.store_id : '' } />
         </div>
     )
 }

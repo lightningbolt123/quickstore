@@ -15,7 +15,7 @@ const StoreCard = ({ store, message, loading }) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (message) {
+        if (JSON.stringify(message) !== '{}') {
             setTimeout(() => {
                 dispatch(clearMessages());
             },3000);

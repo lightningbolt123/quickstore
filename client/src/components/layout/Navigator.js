@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { logout } from '../../reducers/authSlice';
+import { clearStore } from '../../reducers/storeSlice';
 
 const Navigator = () => {
     const [ menuState, setMenuState ] = useState(false);
@@ -16,6 +17,7 @@ const Navigator = () => {
 
     const logoutUser = () => {
         dispatch(logout());
+        dispatch(clearStore());
         navigate('/login');
     }
 

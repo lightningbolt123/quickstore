@@ -12,10 +12,10 @@ const ProfilePicture = ({ user, message }) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (user.photo.secure_url) {
-            setPicture(user.photo.secure_url);
+        if (user.photo) {
+            setPicture(user.photo.secure_url ? user.photo.secure_url : '');
         }
-    },[user.photo.secure_url]);
+    },[user.photo]);
 
     const onChange = (e) => {
         const file = e.target.files[0];

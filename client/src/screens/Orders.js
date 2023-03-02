@@ -14,7 +14,7 @@ const Orders = () => {
     },[dispatch]);
     
     return (
-        <div style={{ overflowX: 'scroll', overflowY: 'auto' }} className='order'>
+        <div style={{ overflowX: 'scroll', overflowY: 'auto', marginTop: '10px' }} className='order'>
             <Header text='Orders' />
             <table>
                 <thead>
@@ -34,7 +34,7 @@ const Orders = () => {
                             <td>{index + 1}</td>
                             <td>{formatDate(order.date)}</td>
                             <td>{new Date(order.date).toLocaleTimeString()}</td>
-                            <td style={{ color: '#1483b8' }}><Link to={`/invoice/${order._id}`} className='remove-link-style'>{order._id}</Link></td>
+                            <td style={{ color: '#1483b8' }}><Link to={`/orders/${order._id}`} className='remove-link-style'>{order._id}</Link></td>
                             <td>{order.customerfirstname}{' '}{order.customerlastname}</td>
                             <td>{order.customerphone}</td>
                             <td>{order.goodspurchased.length}</td>

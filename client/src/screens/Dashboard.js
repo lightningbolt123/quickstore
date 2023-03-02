@@ -1,6 +1,6 @@
 import { Fragment, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { faHeart, faGear, faList, faStore, faFileInvoice, faBuildingColumns } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faGear, faList, faStore, faWallet, faBuildingColumns } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadUser } from '../reducers/authSlice';
@@ -34,10 +34,10 @@ const links = [
     },
     {
         id: '4',
-        name: 'Bank accounts',
-        path: 'bank-accounts',
+        name: 'Wallet',
+        path: 'wallet',
         color: '#2596be',
-        icon: faBuildingColumns
+        icon: faWallet
     },
     {
         id: '5',

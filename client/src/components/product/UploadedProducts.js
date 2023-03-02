@@ -13,10 +13,8 @@ const UploadedProducts = ({ storeId }) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (storeId) {
-            dispatch(getVendorProducts(storeId));
-        }
-    },[dispatch, storeId]);
+        dispatch(getVendorProducts(storeId));
+    },[]);
 
     const removeProduct = (e, id) => {
         e.preventDefault();
@@ -62,10 +60,6 @@ const UploadedProducts = ({ storeId }) => {
             </table>
         </div>
     )
-}
-
-UploadedProducts.propTypes = {
-    storeId: PropTypes.number
 }
 
 export default UploadedProducts;

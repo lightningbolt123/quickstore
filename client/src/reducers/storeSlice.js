@@ -84,6 +84,9 @@ export const storeSlice = createSlice({
         clearMessages: (state) => {
             state.msg = {};
             state.errors = [];
+        },
+        clearStore: (state) => {
+            state.store = null;
         }
     },
     extraReducers: (builder) => {
@@ -156,6 +159,6 @@ export const storeSlice = createSlice({
     }
 });
 
-export const { clearMessages } = storeSlice.actions;
+export const { clearMessages, clearStore } = storeSlice.actions;
 
 export default storeSlice.reducer;

@@ -21,6 +21,8 @@ import UpdateProduct from './screens/UpdateProduct';
 import Cart from './screens/Cart';
 import Invoice from './screens/Invoice';
 import Orders from './screens/Orders';
+import Order from './screens/Order';
+import Wallet from './screens/Wallet';
 
 const token = localStorage.getItem("token");
 if (token) {
@@ -55,6 +57,8 @@ function App() {
           <Route path="/add-product" element={<PrivateRoute ><AddProduct /></PrivateRoute>} />
           <Route path="/update-product/:id" element={<PrivateRoute><UpdateProduct /></PrivateRoute>} />
           <Route path="/orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
+          <Route path="/orders/:id" element={<PrivateRoute><Order /></PrivateRoute>} />
+          <Route path="/wallet" element={<PrivateRoute><Wallet /></PrivateRoute>} />
         </Routes>
       </div>
       <Footer />
