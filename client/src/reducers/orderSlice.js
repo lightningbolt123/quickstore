@@ -62,6 +62,18 @@ export const updateInvoice = createAsyncThunk(
     }
 );
 
+export const getOrder = createAsyncThunk(
+    "order/getOrderStatus",
+    async (id, { rejectWithValue }) => {
+        try {
+            const response = await orderAPI.getOrder(id);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
 const initialState = {
     loading: true,
     orders: [],
@@ -83,16 +95,16 @@ export const orderSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(placeOrder.pending, (state, { payload }) => {
-            state.pending = true;
+            state.loading = true;
         });
         builder.addCase(placeOrder.fulfilled, (state, { payload }) => {
-            state.pending = false;
+            state.loading = false;
             const { data, ...rest } = payload;
             state.message = rest;
             if (data) state.invoices.unshift(data); 
         });
         builder.addCase(placeOrder.rejected, (state, { payload }) => {
-            state.pending = false;
+            state.loading = false;
             if (payload.errors && payload.errors.length > 0) {
                 state.errors = payload.errors;
             } else {
@@ -100,23 +112,23 @@ export const orderSlice = createSlice({
             }
         });
         builder.addCase(getInvoices.pending, (state, { payload }) => {
-            state.pending = true;
+            state.loading = true;
         });
         builder.addCase(getInvoices.fulfilled, (state, { payload }) => {
-            state.pending = false;
+            state.loading = false;
             const { data, ...rest } = payload;
             state.invoices = data;
             state.message = rest;
         });
         builder.addCase(getInvoices.rejected, (state, { payload }) => {
-            state.pending = false;
+            state.loading = false;
             state.message = payload;
         });
         builder.addCase(getOrders.pending, (state, { payload }) => {
-            state.pending = true;
+            state.loading = true;
         });
         builder.addCase(getOrders.fulfilled, (state, { payload }) => {
-            state.pending = false;
+            state.loading = false;
             const { data, ...rest } = payload;
             state.orders = data;
             state.message = rest;
@@ -148,6 +160,18 @@ export const orderSlice = createSlice({
             state.invoice = state.invoice.goodspurchased.map(item => item._id === payload.item_id ? {...item, status: payload.order_status } : item);
         });
         builder.addCase(updateInvoice.rejected, (state, { payload }) => {
+            state.loading = false;
+            state.message = payload;
+        });
+        builder.addCase(getOrder.pending, (state, { payload }) => {
+            state.loading = true;
+        });
+        builder.addCase(getOrder.fulfilled, (state, { payload }) => {
+            state.loading = false;
+            state.message = { status: payload.status, status_code: payload.status_code };
+            state.invoice = payload.data;
+        });
+        builder.addCase(getOrder.rejected, (state, { payload }) => {
             state.loading = false;
             state.message = payload;
         });

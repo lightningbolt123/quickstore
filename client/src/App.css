@@ -139,6 +139,13 @@ form, .success-box-style {
   border-radius: 5px;
 }
 
+.order {
+  width: 60%;
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 5px;
+}
+
 input[type=text], input[type=password], input[type=number] {
   background-color: inherit;
   height: 20px;
@@ -506,6 +513,10 @@ a {
   }
 
   .invoice {
+    width: 90%;
+  }
+
+  .order {
     width: 90%;
   }
 

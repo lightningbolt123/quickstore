@@ -20,8 +20,8 @@ const links = [
     },
     {
         id: '2',
-        name: 'Customer purchase history',
-        path: 'customer-purchase-history',
+        name: 'Orders',
+        path: 'orders',
         color: '#2596be',
         icon: faList
     },

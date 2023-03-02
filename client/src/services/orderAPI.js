@@ -23,7 +23,15 @@ export const getOrders = () => {
     if (token) {
         setAuthToken(token);
     }
-    return axios.get('http://localhost:5000/api/orders/purchasehistory', headerConfig);
+    return axios.get('http://localhost:5000/api/orders/vendororders', headerConfig);
+}
+
+export const getOrder = (id) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return axios.get(`http://localhost:5000/api/orders/vendororders/${id}`);
 }
 
 export const getInvoice = (id) => {
@@ -47,5 +55,6 @@ export const orderAPI = {
     getInvoices,
     getInvoice,
     getOrders,
+    getOrder,
     updateInvoiceStatus
 }

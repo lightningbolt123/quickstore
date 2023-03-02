@@ -38,6 +38,11 @@ router.get('/vendororders', auth, orderControllers.getOrders);
 // @Access  Private
 router.get('/invoice/:id', auth, orderControllers.getInvoice);
 
+// @Route   GET api/orders/vendororders/:id
+// @Desc    Route for getting a single order on the store owner's dashboard
+// @Access  Private
+router.get('/vendororders/:id', auth, orderControllers.getOrder);
+
 // @Route   GET api/orders/purchasehistory
 // @Desc    Route for getting the purchase history of the logged in user
 // @Access  Private

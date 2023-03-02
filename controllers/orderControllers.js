@@ -357,6 +357,50 @@ const getOrders = async (req, res) => {
     }
 }
 
+// Controller for getting Details of individual order
+const getOrder = async (req, res) => {
+    try {
+        // Destructure the id of the order from the request parameter
+        const { id } = req.params;
+        // Get user account
+        const user = await User.findById(req.user.id);
+        // Check if user account exists
+        if (!user) {
+            return res.status(401).json({
+                msg: 'You are not authorized to make use of this feature.',
+                status: 'unauthorized',
+                status_code: '401'
+            });
+        }
+        // Get vendor store
+        const store = await pool.query('SELECT * FROM store WHERE seller_id=$1',[req.user.id]);
+        // Get all the orders belonging to the logged in vendor
+        const order = await Order.findOne({ items: { $elemMatch: { storeid: store.rows[0].store_id } } });
+        // Check if the orders array is empty or not
+        if (!order) {
+            return res.status(200).json({
+                status: 'success',
+                status_code: '200',
+                data: []
+            });
+        } else {
+            return res.status(200).json({
+                status: 'success',
+                status_code: '200',
+                data: order
+            });
+        }
+    } catch (error) {
+        if (error) {
+            return res.status(503).json({
+                msg: 'Sorry we are unable to get your orders at the moment. Please try again later, thank you.',
+                status: 'service unavailable',
+                status_code: '503'
+            });
+        }
+    }
+}
+
 // Controller for getting customer order history on the platform
 const getPurchaseHistory = async (req, res) => {
     try {
@@ -441,6 +485,7 @@ module.exports = {
     placeOrder,
     updateOrderStatus,
     getOrders,
+    getOrder,
     getPurchaseHistory,
     userIsVendor,
     getInvoice
