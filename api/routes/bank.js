@@ -32,20 +32,20 @@ router.put('/:id', [
     ]
 ], bankControllers.editBankAccount);
 
-// @Route   GET api/bank/myaccounts
+// @Route   GET api/bank/
 // @Desc    Route for getting all the bank accounts of the logged in user
 // @Access  Private
-router.get('/myaccounts', auth, bankControllers.getBankAccounts);
+router.get('/', auth, bankControllers.getBankAccounts);
 
-// @Route   GET api/bank/myaccounts/:id
+// @Route   GET api/bank/:id
 // @Desc    Route for getting single bank details
 // @Access  Private
-router.get('/myaccounts/:id', auth, bankControllers.getBankAccount);
+router.get('/:id', auth, bankControllers.getBankAccount);
 
 // @Route   DELETE api/bank/myaccounts/:id
 // @Desc    Route for deleting a bank account of the logged in user
 // @Access  Private
-router.delete('/myaccounts/:id', auth, bankControllers.deleteBankAccount);
+router.delete('/:id', auth, bankControllers.deleteBankAccount);
 
 // Export the router
 module.exports = router;

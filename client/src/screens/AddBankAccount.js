@@ -4,6 +4,8 @@ import Header from '../components/layout/Header';
 import FormAlert from '../components/layout/FormAlert';
 import { faCheck, faUser, faBank, faCreditCard, faUpload } from '@fortawesome/free-solid-svg-icons';
 import InputField from '../components/layout/InputField';
+import { useSelector, useDispatch } from 'react-redux';
+import { addBankAccount, clearWalletMessages } from '../reducers/walletSlice';
 
 const AddBankAccount = () => {
     const [ formData, setFormData ] = useState({
@@ -12,28 +14,52 @@ const AddBankAccount = () => {
         accountiban: '',
         cardnumber: ''
     });
+    const { message, errors } = useSelector(state => state.wallet);
+    const dispatch = useDispatch();
 
+    useEffect(() => {
+        if (message.status === 'success' || errors.length > 0) {
+            setTimeout(() => {
+                dispatch(clearWalletMessages());
+                setFormData({
+                    accountname: '',
+                    bankname: '',
+                    accountiban: '',
+                    cardnumber: ''
+                });
+            }, 5000);
+        }
+    },[message]);
+    
     const getError = (name) => {
-        // const findError = errors.filter(error => error.param === name);
-        // if (findError.length > 0) {
-        //     const error = errors.find(error => error.param === name);
-        //     return error;
-        // }
+        const findError = errors.filter(error => error.param === name);
+        if (findError.length > 0) {
+            const error = errors.find(error => error.param === name);
+            return error;
+        }
     }
 
     const onChange = (e) => {
         setFormData({...formData, [e.target.name]: e.target.value});
     }
-     const {
+
+    const {
         accountname,
         bankname,
         accountiban,
         cardnumber
-     } = formData;
+    } = formData;
+
+    const onSubmit = (e) => {
+        e.preventDefault();
+        dispatch(addBankAccount(formData));
+        // console.log(formData);
+    }
 
     return (
-        <form className='dashboard-form'>
+        <form onSubmit={(e) => onSubmit(e)} className='dashboard-form'>
             <Header text='Add bank account' />
+            {JSON.stringify(message) !== '{}' ? (<FormAlert alert={message} />) : ''}
             <InputField label='Account name' type='text' name='accountname' value={accountname} error={getError('accountname')} changeHandler={onChange} icon={faUser} />
             <InputField label='Bank name' type='text' name='bankname' value={bankname} error={getError('bankname')} changeHandler={onChange} icon={faBank} />
             <InputField label='IBAN' type='text' name='accountiban' value={accountiban} error={getError('accountiban')} changeHandler={onChange} icon={faCreditCard} />

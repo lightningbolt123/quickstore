@@ -34,7 +34,8 @@ const addBankAccount = async (req, res) => {
         return res.status(201).json({
             msg: 'Your bank details have been successfully added to our database.',
             status: 'created',
-            status_code: '201'
+            status_code: '201',
+            data: bank
         });
     } catch (error) {
         // Check for error and return error response
@@ -62,7 +63,7 @@ const editBankAccount = async (req, res) => {
         // Check if the bank exists
         if (!bank) {
             return res.status(404).json({
-                msg: 'The bank details with this id does not exist on our database.',
+                msg: 'This bank details does not exist on our database.',
                 status: 'not found',
                 status_code: '404'
             });
@@ -75,11 +76,12 @@ const editBankAccount = async (req, res) => {
             });
         }
         // Update the bank account details
-        bank = await BankAccount.findByIdAndUpdate({ _id: req.params.id }, { bankname, accountname, accountiban, cardnumber });
+        bank = await BankAccount.findByIdAndUpdate({ _id: req.params.id }, { bankname, accountname, accountiban, cardnumber }, { new: true });
         return res.status(201).json({
             msg: 'Your bank details was updated successfully.',
             status: 'created',
-            status_code: '201'
+            status_code: '201',
+            data: bank
         });
     } catch (error) {
         // Check for error and return error response
@@ -105,15 +107,9 @@ const getBankAccounts = async (req, res) => {
             });
         }
         // Fetch all bank accounts belonging to the logged in user
-        const accounts = await BankAccount.find({ owner: req.user.id });
-        // Check if the user has previously uploaded any bank account
-        if (!accounts) {
-            // Success response
-            return res.status(200).json({ status: 'success', status_code: '200', data: accounts });
-        } else {
-            // Success response
-            return res.status(200).json({ status: 'success', status_code: '200', data: accounts });
-        }
+        const accounts = await BankAccount.find({ owner: req.user.id }).sort({ data: -1 });
+        // Success response
+        return res.status(200).json({ status: 'success', status_code: '200', data: accounts });
     } catch (error) {
         // Check for error and return error response
         if (error) {
@@ -206,8 +202,10 @@ const deleteBankAccount = async (req, res) => {
         await account.remove();
         // Return success response
         return res.status(200).json({
+            msg: 'Bank account deleted successfully.',
             status: 'success',
-            status_code: '200'
+            status_code: '200',
+            id: req.params.id
         });
     } catch (error) {
         // Return catched error response

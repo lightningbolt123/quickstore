@@ -62,7 +62,7 @@ function App() {
           <Route path="/orders/:id" element={<PrivateRoute><Order /></PrivateRoute>} />
           <Route path="/wallet" element={<PrivateRoute><Wallet /></PrivateRoute>} />
           <Route path="/add-bank" element={<PrivateRoute><AddBankAccount /></PrivateRoute>} />
-          <Route path="/edit-bank" element={<PrivateRoute><EditBankAccount /></PrivateRoute>} />
+          <Route path="/edit-bank/:id" element={<PrivateRoute><EditBankAccount /></PrivateRoute>} />
         </Routes>
       </div>
       <Footer />

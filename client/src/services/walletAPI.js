@@ -7,7 +7,7 @@ const getBankAccounts = () => {
     if (token) {
         setAuthToken(token);
     }
-    return axios.get('http://localhost:5000/api/bank/myaccounts', headerConfig);
+    return axios.get('http://localhost:5000/api/bank/', headerConfig);
 }
 
 const getBankAccount = (id) => {
@@ -15,7 +15,7 @@ const getBankAccount = (id) => {
     if (token) {
         setAuthToken(token);
     }
-    return axios.get(`http://localhost:5000/api/bank/myaccounts/${id}`, headerConfig);
+    return axios.get(`http://localhost:5000/api/bank/${id}`, headerConfig);
 }
 
 const addBankAccount = (data) => {
@@ -35,9 +35,18 @@ const editBankAccount = (accountData) => {
     return axios.put(`http://localhost:5000/api/bank/${id}`, JSON.stringify(data), headerConfig);
 }
 
+const deleteBank = (id) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return axios.delete(`http://localhost:5000/api/bank/${id}`, headerConfig);
+}
+
 export const walletAPI = {
     getBankAccounts,
     getBankAccount,
     addBankAccount,
-    editBankAccount
+    editBankAccount,
+    deleteBank
 }
