@@ -18,7 +18,7 @@ const AddBankAccount = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (message.status === 'success' || errors.length > 0) {
+        if (message.status_code === '201' || errors.length > 0) {
             setTimeout(() => {
                 dispatch(clearWalletMessages());
                 setFormData({

@@ -94,6 +94,7 @@ router.post('/', [
                         msg: 'Your account is inactive so we sent you an otp to your phone for activating your account.',
                         status: 'created',
                         status_code: '201',
+                        activation_status: 'pending',
                         data: {
                             countrycode: user.countrycode,
                             phonenumber: user.phonenumber

@@ -1,5 +1,5 @@
 function formatTime (date) {
-    new Date(date).toLocaleTimeString()
+    return new Date(date).toLocaleTimeString()
 }
 
 export default formatTime;

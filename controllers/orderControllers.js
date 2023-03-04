@@ -201,19 +201,22 @@ const updateOrderStatus = async (req, res) => {
         }
         // Get order object
         const orderObject = order.goodspurchased.find(item => item._id.toString() === item_id);
-        // Update order status
-        order.goodspurchased.map(item => item._id.toString() === item_id ? item.status = newstatus : item);
-        // Save order
-        await order.save();
         // Get the vendor wallet
         const wallet = await pool.query('SELECT * FROM wallet WHERE store_id=$1',[orderObject.storeid]);
         // Check status
         if (newstatus === 'received' && orderObject.status === 'processing') {
+            // Update order status
+            order.goodspurchased.map(item => item._id.toString() === item_id ? item.status = newstatus : item);
             // Create new available balance and ledger balance
-            const availableBalance = wallet.rows[0].available_balance + parseFloat(orderObject.cost);
-            const ledgerBalance = wallet.rows[0].ledger_balance - parseFloat(orderObject.cost);
+            const availableBalance = parseFloat(wallet.rows[0].available_balance) + parseFloat(orderObject.cost);
+            const ledgerBalance = parseFloat(wallet.rows[0].ledger_balance) - parseFloat(orderObject.cost);
             // Update the vendor wallet balance
-            await pool.query('UPDATE wallet SET available_balance=$1, ledger_balance=$2 WHERE store_id=$3', [availableBalance, ledgerBalance, orderObject.storeid]);
+            const result = await pool.query('UPDATE wallet SET available_balance=$1, ledger_balance=$2 WHERE store_id=$3', [availableBalance, ledgerBalance, orderObject.storeid]);
+            if (result) {
+                // Save order
+                await order.save();
+            }
+            // Return success response
             return res.status(200).json({
                 msg: 'You have successfully confirmed the receival of this product.',
                 status: 'success',
@@ -228,10 +231,16 @@ const updateOrderStatus = async (req, res) => {
             } else {
                 goods = 'item';
             }
+            // Update order status
+            order.goodspurchased.map(item => item._id.toString() === item_id ? item.status = newstatus : item);
             // Create new ledger balance
-            const ledgerBalance = wallet.rows[0].ledger_balance - parseFloat(orderObject.cost);
+            const ledgerBalance = parseFloat(wallet.rows[0].ledger_balance) - parseFloat(orderObject.cost);
             // Update the vendor wallet balance
-            await pool.query('UPDATE wallet SET ledger_balance=$1 WHERE store_id=$2', [ledgerBalance, orderObject.storeid]);
+            const result = await pool.query('UPDATE wallet SET ledger_balance=$1 WHERE store_id=$2', [ledgerBalance, orderObject.storeid]);
+            if (result) {
+                // Save order
+                await order.save();
+            }
             // Send notification sms to the customer that their purchase has been cancelled and their funds have refunded to their account
             await client.messages.create({
                 body: `Hi ${order.customerfirstname} ${order.customerlastname}, your order for the purchase of ${order.goodspurchased.length} ${goods} has been cancelled and your funds are been processed. Thank you once more for using quickstore.`,
@@ -248,7 +257,7 @@ const updateOrderStatus = async (req, res) => {
             });
         } else if (orderObject.status !== 'processing') {
             return res.status(200).json({
-                msg: 'You have already confirmed this order.',
+                msg: 'You have already updated this order status.',
                 status: 'success',
                 status_code: '200',
                 order_status: orderObject.status,

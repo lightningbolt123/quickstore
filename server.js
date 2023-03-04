@@ -17,6 +17,7 @@ app.use('/api/auth', require('./api/routes/auth'));
 app.use('/api/store', require('./api/routes/store'));
 app.use('/api/bank', require('./api/routes/bank'));
 app.use('/api/orders', require('./api/routes/orders'));
+app.use('/api/wallet', require('./api/routes/wallet'));
 
 const server = createServer(app);
 
