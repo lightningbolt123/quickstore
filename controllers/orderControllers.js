@@ -10,6 +10,7 @@ const client = require('twilio')(accountSid, authToken);
 
 const cards = [
     {
+        iban: "GB33BUKB20201555555555",
         cardnumber: "4242424242424242",
         cardtype: "visa",
         cvv: "721",
@@ -18,6 +19,7 @@ const cards = [
         currency: "USD"
     },
     {
+        iban: "DE89370400440532013000",
         cardnumber: "4000056655665556",
         cardtype: "visa_debit",
         cvv: "637",
@@ -26,6 +28,7 @@ const cards = [
         currency: "USD"
     },
     {
+        iban: "DE62370400440532013001",
         cardnumber: "5555555555554444",
         cardtype: "mastercard",
         cvv: "468",
@@ -34,6 +37,7 @@ const cards = [
         currency: "USD"
     },
     {
+        iban: "DE89370400440532013002",
         cardnumber: "5200828282828210",
         cardtype: "mastercard_debit",
         cvv: "551",
@@ -243,7 +247,7 @@ const updateOrderStatus = async (req, res) => {
             }
             // Send notification sms to the customer that their purchase has been cancelled and their funds have refunded to their account
             await client.messages.create({
-                body: `Hi ${order.customerfirstname} ${order.customerlastname}, your order for the purchase of ${order.goodspurchased.length} ${goods} has been cancelled and your funds are been processed. Thank you once more for using quickstore.`,
+                body: `Hi ${order.customerfirstname} ${order.customerlastname}, your order for the purchase of ${orderObject.productname} has been cancelled and your funds are been processed. Thank you once more for using quickstore.`,
                 from: '+12075033646',
                 to: `${order.customerphone}`
             });

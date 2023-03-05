@@ -4,6 +4,7 @@ import authReducer from './reducers/authSlice';
 import storeReducer from './reducers/storeSlice';
 import cartReducer from './reducers/cartSlice';
 import orderReducer from './reducers/orderSlice';
+import bankReducer from './reducers/bankSlice';
 import walletReducer from './reducers/walletSlice';
 
 const store = configureStore({
@@ -13,6 +14,7 @@ const store = configureStore({
         store: storeReducer,
         cart: cartReducer,
         order: orderReducer,
+        bank: bankReducer,
         wallet: walletReducer
     },
 });

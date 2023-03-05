@@ -6,12 +6,12 @@ import SmallButton from '../components/layout/SmallButton';
 import { faMoneyBillTransfer, faPlus, faCancel } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useDispatch, useSelector } from 'react-redux';
-import { getBankAccounts, deleteBankAccount } from '../reducers/walletSlice';
+import { getBankAccounts, deleteBankAccount } from '../reducers/bankSlice';
 import formatDate from '../utils/formatDate';
 import formatTime from '../utils/formatTime';
 
 const Wallet = () => {
-    const { bankAccounts } = useSelector(state => state.wallet);
+    const { bankAccounts } = useSelector(state => state.bank);
     const dispatch = useDispatch();
 
     useEffect(() => {

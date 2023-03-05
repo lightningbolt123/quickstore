@@ -1,47 +1,13 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { buildCheckFunction } from "express-validator";
 import { walletAPI } from "../services/walletAPI";
 
-export const addBankAccount = createAsyncThunk(
-    "wallet/addBankAccountStatus",
-    async (data, { rejectWithValue }) => {
-        try {
-            const response = await walletAPI.addBankAccount(data);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response.data);
-        }
-    }
-);
-
-export const editBankAccount = createAsyncThunk(
-    "wallet/editBankAccountStatus",
-    async (data, { rejectWithValue }) => {
-        try {
-            const response = await walletAPI.editBankAccount(data);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response.data);
-        }
-    }
-);
-
-export const getBankAccount = createAsyncThunk(
-    "wallet/getBankAccountStatus",
-    async (id, { rejectWithValue }) => {
-        try {
-            const response = await walletAPI.getBankAccount(id);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response.data);
-        }
-    }
-);
-
-export const getBankAccounts = createAsyncThunk(
-    "wallet/getBankAccountsStatus",
+// Function for getting wallet balance
+export const getBalance = createAsyncThunk(
+    "wallet/getWalletBalanceStatus",
     async (_, { rejectWithValue }) => {
         try {
-            const response = await walletAPI.getBankAccounts();
+            const response = await walletAPI.getWalletBalance();
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -49,11 +15,12 @@ export const getBankAccounts = createAsyncThunk(
     }
 );
 
-export const deleteBankAccount = createAsyncThunk(
-    "wallet/deleteBankAccountStatus",
-    async (id, { rejectWithValue }) => {
+// Function for withdrawing funds
+export const withdrawFunds = createAsyncThunk(
+    "wallet/withdrawFundsStatus",
+    async (data, { rejectWithValue }) => {
         try {
-            const response = await walletAPI.deleteBank(id);
+            const response = await walletAPI.withdrawFundFromWallet(data);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -61,97 +28,66 @@ export const deleteBankAccount = createAsyncThunk(
     }
 );
 
-
+// State for storing the wallet data
 const initialState = {
-    bankAccount: {},
-    bankAccounts: [],
     loading: false,
-    message: {},
+    available_balance: 0,
+    ledger_balance: 0,
+    currency: '',
+    walletMessage: {},
     errors: []
 }
 
+// Wallet slice
 export const walletSlice = createSlice({
     name: "wallet",
     initialState,
     reducers: {
-        clearWalletMessages: (state) => {
-            state.message = {};
-            state.errors = [];
+        clearWalletMessage: (state) => {
+            state.walletMessage = {};
         },
-        clearBankAccounts: (state) => {
-            state.bankAccounts = [];
+        clearWalletErrors: (state) => {
+            state.errors = [];
         }
     },
     extraReducers: (builder) => {
-        builder.addCase(addBankAccount.pending, (state, { payload }) => {
+        builder.addCase(getBalance.pending, (state, { payload }) => {
             state.loading = true;
         });
-        builder.addCase(addBankAccount.fulfilled, (state, { payload }) => {
+
+        builder.addCase(getBalance.fulfilled, (state, { payload }) => {
             state.loading = false;
             const { data, ...rest } = payload;
-            if (data) state.bankAccounts.unshift(data);
-            state.message = rest;
+            state.walletMessage = rest;
+            state.available_balance = data.available_balance;
+            state.ledger_balance = data.ledger_balance;
+            state.currency = data.currency;
         });
-        builder.addCase(addBankAccount.rejected, (state, { payload }) => {
+
+        builder.addCase(getBalance.rejected, (state, { payload }) => {
             state.loading = false;
-            if (payload.errors) state.errors = payload.errors;
-            state.message = payload;
+            state.walletMessage = payload;
         });
-        builder.addCase(editBankAccount.pending, (state, { payload }) => {
+
+        builder.addCase(withdrawFunds.pending, (state, { payload }) => {
             state.loading = true;
         });
-        builder.addCase(editBankAccount.fulfilled, (state, { payload }) => {
+
+        builder.addCase(withdrawFunds.fulfilled, (state, { payload }) => {
             state.loading = false;
-            const { data, ...rest } = payload;
-            state.bankAccount = data;
-            state.message = rest;
+            state.walletMessage = payload;
         });
-        builder.addCase(editBankAccount.rejected, (state, { payload }) => {
+
+        builder.addCase(withdrawFunds.rejected, (state, { payload }) => {
             state.loading = false;
-            if (payload.errors) state.errors = payload.errors;
-            state.message = payload;
-        });
-        builder.addCase(getBankAccounts.pending, (state, { payload }) => {
-            state.loading = true;
-            state.bankAccount = {};
-        });
-        builder.addCase(getBankAccounts.fulfilled, (state, { payload }) => {
-            state.loading = false;
-            const { data, ...rest } = payload;
-            if (data) state.bankAccounts = data;
-            state.message = rest;
-        });
-        builder.addCase(getBankAccounts.rejected, (state, { payload }) => {
-            state.loading = false;
-        });
-        builder.addCase(getBankAccount.pending, (state, { payload }) => {
-            state.loading = true;
-        });
-        builder.addCase(getBankAccount.fulfilled, (state, { payload }) => {
-            state.loading = false;
-            const { data, ...rest } = payload;
-            if (data) state.bankAccount = data;
-            state.message = rest;
-        });
-        builder.addCase(getBankAccount.rejected, (state, { payload }) => {
-            state.loading = false;
-            state.message = payload;
-        });
-        builder.addCase(deleteBankAccount.pending, (state, { payload }) => {
-            state.loading = true;
-        });
-        builder.addCase(deleteBankAccount.fulfilled, (state, { payload }) => {
-            state.loading = false;
-            const { id, ...rest } = payload;
-            state.bankAccounts = state.bankAccounts.filter(account => account._id !== id);
-            state.message = rest;
-        });
-        builder.addCase(deleteBankAccount.rejected, (state, { payload }) => {
-            state.loading = false;
-            state.message = payload;
+            if (payload.errors) {
+                state.errors = payload.errors;
+            } else {
+                state.walletMessage = payload;
+            }
         });
     }
 });
 
-export const { clearWalletMessages, clearBankAccounts } = walletSlice.actions;
+export const { clearWalletErrors, clearWalletMessage } = walletSlice.actions;
 export default walletSlice.reducer;

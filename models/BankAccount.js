@@ -6,22 +6,30 @@ const BankAccountSchema = new mongoose.Schema({
         ref: 'user',
         required: true
     },
-    bankname: {
-        type: String,
-        required: true
-    },
-    accountname: {
-        type: String,
-        required: true
-    },
-    accountiban: {
-        type: String,
-        required: true
-    },
-    cardnumber: {
-        type: Number,
-        required: true
-    },
+    items: [
+        {
+            bankname: {
+                type: String,
+                required: true
+            },
+            accountname: {
+                type: String,
+                required: true
+            },
+            accountiban: {
+                type: String,
+                required: true
+            },
+            cardnumber: {
+                type: Number,
+                required: true
+            },
+            date: {
+                type: Date,
+                default: Date.now
+            }
+        }
+    ],
     date: {
         type: Date,
         default: Date.now

@@ -6,7 +6,7 @@ import FormAlert from '../components/layout/FormAlert';
 import { faUser, faBank, faCreditCard, faEdit } from '@fortawesome/free-solid-svg-icons';
 import InputField from '../components/layout/InputField';
 import { useSelector, useDispatch } from 'react-redux';
-import { getBankAccount, editBankAccount, clearWalletMessages } from '../reducers/walletSlice';
+import { getBankAccount, editBankAccount, clearBankMessages } from '../reducers/bankSlice';
 
 const EditBankAccount = () => {
     const [ formData, setFormData ] = useState({
@@ -16,7 +16,7 @@ const EditBankAccount = () => {
         cardnumber: ''
     });
 
-    const { bankAccount, message, errors } = useSelector(state => state.wallet);
+    const { bankAccount, message, errors } = useSelector(state => state.bank);
     const dispatch = useDispatch();
     const { id } = useParams();
 
@@ -36,7 +36,7 @@ const EditBankAccount = () => {
     useEffect(() => {
         if (message.status || errors.length > 0) {
             setTimeout(() => {
-                dispatch(clearWalletMessages());
+                dispatch(clearBankMessages());
             }, 5000);
         }
     },[message]);

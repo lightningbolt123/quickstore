@@ -21,14 +21,31 @@ const addBankAccount = async (req, res) => {
                 status_code: '401'
             });
         }
+        // First check if the user has already added bank accounts before
+        let bank = await BankAccount.findOne({ owner: req.user.id });
+        if (!bank) {
+            bank = new BankAccount({
+                owner: req.user.id,
+                items: [{ bankname, accountname, accountiban, cardnumber }]
+            });
+        } else {
+            if (bank.items.filter(item => item.accountiban === accountiban).length > 0) {
+                return res.status(200).json({
+                    msg: 'You have already saved a bank account with this IBAN.',
+                    status: 'success',
+                    status_code: '200'
+                });
+            }
+            bank.items.unshift({ bankname, accountname, accountiban, cardnumber });
+        }
         // Add bank account to database
-        const bank = new BankAccount({
-            owner: req.user.id,
-            bankname,
-            accountname,
-            accountiban,
-            cardnumber
-        });
+        // const bank = new BankAccount({
+        //     owner: req.user.id,
+        //     bankname,
+        //     accountname,
+        //     accountiban,
+        //     cardnumber
+        // });
         // Save the bank account to the database
         await bank.save();
         return res.status(201).json({
@@ -38,10 +55,11 @@ const addBankAccount = async (req, res) => {
             data: bank
         });
     } catch (error) {
+        console.log(error);
         // Check for error and return error response
         if (error) {
             return res.status(503).json({
-                msg: 'Sorry we are unable to add your bank account at the moment. Please trya gaian later, thank you.',
+                msg: 'Sorry we are unable to add your bank account at the moment. Please try again later, thank you.',
                 status: 'service unavailable',
                 status_code: '503'
             });
@@ -59,31 +77,35 @@ const editBankAccount = async (req, res) => {
     const { bankname, accountname, accountiban, cardnumber } = req.body;
     try {
         // Fetch the bank account details with the url id from the database
-        let bank = await BankAccount.findById(req.params.id);
+        const bank = await BankAccount.findOne({ owner: req.user.id });
         // Check if the bank exists
-        if (!bank) {
+        if (bank.items.filter(item => item._id.toString() === req.params.id).length === 0) {
             return res.status(404).json({
                 msg: 'This bank details does not exist on our database.',
                 status: 'not found',
                 status_code: '404'
             });
         }
-        if (bank.owner.toString() !== req.user.id) {
-            return res.status(401).json({
-                msg: 'You are not allowed to edit this bank details because you are not the owner of the account.',
-                status: 'unauthorized',
-                status_code: '401'
-            });
-        }
+        const editedBank = {
+            bankname,
+            accountname,
+            accountiban,
+            cardnumber
+        };
         // Update the bank account details
-        bank = await BankAccount.findByIdAndUpdate({ _id: req.params.id }, { bankname, accountname, accountiban, cardnumber }, { new: true });
+        bank.items = bank.items.map(item => item._id.toString() === req.params.id ? {...item, ...editedBank} : item);
+        await bank.save();
+        // Get the account details of the recently edited account
+        const account = bank.items.find(item => item._id.toString() === req.params.id);
+        // bank = await BankAccount.findByIdAndUpdate({ _id: req.params.id }, { bankname, accountname, accountiban, cardnumber }, { new: true });
         return res.status(201).json({
             msg: 'Your bank details was updated successfully.',
             status: 'created',
             status_code: '201',
-            data: bank
+            data: account
         });
     } catch (error) {
+        console.log(error);
         // Check for error and return error response
         if (error) {
             return res.status(503).json({
@@ -107,9 +129,9 @@ const getBankAccounts = async (req, res) => {
             });
         }
         // Fetch all bank accounts belonging to the logged in user
-        const accounts = await BankAccount.find({ owner: req.user.id }).sort({ data: -1 });
+        const account = await BankAccount.findOne({ owner: req.user.id });
         // Success response
-        return res.status(200).json({ status: 'success', status_code: '200', data: accounts });
+        return res.status(200).json({ status: 'success', status_code: '200', data: account.items });
     } catch (error) {
         // Check for error and return error response
         if (error) {
@@ -134,28 +156,21 @@ const getBankAccount = async (req, res) => {
             });
         }
         // Fetch the bank account
-        const account = await BankAccount.findById(req.params.id);
+        const account = await BankAccount.findOne({ owner: req.user.id });
         // Check if the bank account exists
-        if (!account) {
+        if (account.items.filter(item => item._id.toString() === req.params.id).length === 0) {
             return res.status(404).json({
                 msg: 'The bank account you are trying to retrieve does not exist.',
                 status: 'not found',
                 status_code: '404'
             });
         }
-        // Check if the logged in user is the owner of the account details
-        if (account.owner.toString() !== req.user.id) {
-            return res.status(401).json({
-                msg: 'You cannot view this account details because you are not the owner of the account.',
-                status: 'unauthorized',
-                status_code: '401'
-            });
-        }
+        const bank = account.items.find(item => item._id.toString() === req.params.id);
         // Return the account successfully
         return res.status(200).json({
             status: 'success',
             status_code: '200',
-            data: account
+            data: bank
         });
     } catch (error) {
         // Return error if error if error is catched
@@ -181,25 +196,18 @@ const deleteBankAccount = async (req, res) => {
             });
         }
         // Fetch the bank account
-        const account = await BankAccount.findById(req.params.id);
+        const account = await BankAccount.findOne({ owner: req.user.id });
         // Check if the bank account exists
-        if (!account) {
+        if (account.items.filter(item => item._id.toString() === req.params.id).length === 0) {
             return res.status(404).json({
                 msg: 'The bank account you are trying to delete does not exist.',
                 status: 'not found',
                 status_code: '404'
             });
         }
-        // Check if the logged in user is the owner of the account details
-        if (account.owner.toString() !== req.user.id) {
-            return res.status(401).json({
-                msg: 'You cannot delete this bank account details because you are not the owner of the account.',
-                status: 'unauthorized',
-                status_code: '401'
-            });
-        }
-        // Delete account
-        await account.remove();
+        const removeIndex = account.items.map(item => item._id.toString()).indexOf(req.params.id);
+        account.items.splice(removeIndex, 1);
+        await account.save();
         // Return success response
         return res.status(200).json({
             msg: 'Bank account deleted successfully.',

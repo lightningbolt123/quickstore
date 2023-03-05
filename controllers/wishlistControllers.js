@@ -2,11 +2,12 @@ const Wishlist = require('../models/Wishlist');
 const User = require('../models/User');
 const { check, validationResult } = require('express-validator');
 
+// Controller for adding items to wishlist
 const addItemToWishlist = async (req, res) => {
     // Check for errors in body request
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.isArray() });
+        return res.status(400).json({ errors: errors.array() });
     }
     // Destructure wishlist details from the body request
     const { productname, productimage, productid, productprice } = req.body;
@@ -22,17 +23,18 @@ const addItemToWishlist = async (req, res) => {
             });
         }
         // Creat new wishlist item
-        const wish = new Wishlist({
-            user: req.user.id,
-            productname,
-            productid,
-            productimage,
-            productprice
-        });
-        
+        let wish = await Wishlist.findOne({ owner: req.user.id });
+        // Check if withlist exists for this user
+        if (!wish) {
+            wish = new Wishlist({
+                owner: req.user.id,
+                items: [{ productname, productimage, productid, productprice }]
+            });
+        } else {
+            wish.items.unshift({ productname, productimage, productid, productprice });
+        }
         // Save wishlist
         await wish.save();
-
         // Return success response
         return res.status(201).json({
             msg: 'You have successfully added this product to your wishlist for future reference. You can view your wishlist by clicking the wishlist icon on the menu.',
@@ -64,21 +66,13 @@ const getWishlist = async (req, res) => {
             });
         }
         // Then fetch wishlist
-        const wishlist = await Wishlist.find({ user: req.user.id });
-        // Check if wishlist exists
-        if (!wishlist) {
-            return res.status(200).json({
-                status: 'success',
-                status_code: '200',
-                data: []
-            });
-        } else {
-            return res.status(200).json({
-                status: 'success',
-                status_code: '200',
-                data: wishlist
-            });
-        }
+        const wishlist = await Wishlist.findOne({ owner: req.user.id });
+        // Return wishlist
+        return res.status(200).json({
+            status: 'success',
+            status_code: '200',
+            data: wishlist.items
+        });
     } catch (error) {
         // Return error if error exists
         if (error) {
@@ -104,28 +98,24 @@ const removeItemFromWishlist = async (req, res) => {
             });
         }
         // Fetch the wishlist item
-        const wishitem = await Wishlist.findById(req.params.id);
+        const wishlist = await Wishlist.findOne({ owner: req.user.id });
         // Check if the item exists
-        if (!wishitem) {
+        if (wishlist.items.filter(item => item._id.toString() === req.params.id).length === 0) {
             return res.status(404).json({
                 msg: 'The item you are trying to delete does not exist on our database.',
                 status: 'not found',
                 status_code: '404'
             });
         }
-        if (wishitem.user.toString() !== req.user.id) {
-            return res.status(401).json({
-                msg: 'You are not allowed to remove this product from it\'s cart because you are not the cart owner.',
-                status: 'unauthorized',
-                status_code: '401'
-            });
-        }
-        await wishitem.remove();
+        // Create wish item removeIndex
+        const removeIndex = wishlist.items.map(item => item._id.toString()).indexOf(req.params.id);
+        wishlist.items.splice(removeIndex, 1);
         // Return success response
         return res.status(200).json({
             msg: 'You have successfully removed an item from your wishlist.',
             status: 'success',
-            status_code: '200'
+            status_code: '200',
+            id
         });
     } catch (error) {
        // Return error if error exists
