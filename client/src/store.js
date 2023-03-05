@@ -6,6 +6,7 @@ import cartReducer from './reducers/cartSlice';
 import orderReducer from './reducers/orderSlice';
 import bankReducer from './reducers/bankSlice';
 import walletReducer from './reducers/walletSlice';
+import wishlistReducer from './reducers/wishlistSlice';
 
 const store = configureStore({
     reducer: {
@@ -15,7 +16,8 @@ const store = configureStore({
         cart: cartReducer,
         order: orderReducer,
         bank: bankReducer,
-        wallet: walletReducer
+        wallet: walletReducer,
+        wishlist: wishlistReducer
     },
 });
 

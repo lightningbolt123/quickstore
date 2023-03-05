@@ -7,15 +7,21 @@ import { faMoneyBillTransfer, faPlus, faCancel } from '@fortawesome/free-solid-s
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { getBankAccounts, deleteBankAccount } from '../reducers/bankSlice';
+import { getBalance } from '../reducers/walletSlice';
 import formatDate from '../utils/formatDate';
 import formatTime from '../utils/formatTime';
 
 const Wallet = () => {
     const { bankAccounts } = useSelector(state => state.bank);
+    const { available_balance, ledger_balance } = useSelector(state => state.wallet);
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(getBankAccounts());
+    },[dispatch]);
+
+    useEffect(() => {
+        dispatch(getBalance());
     },[dispatch]);
 
     const removeBankAccount = (e, id) => {
@@ -28,10 +34,12 @@ const Wallet = () => {
             <div style={{ marginTop: '10px' }} className='order'>
                 <Header text='Wallet' />
                 <div style={{ marginTop: '10px' }}>
-                    <p><span style={{ fontSize: '20px' }}>Available balance $0</span></p>
-                    <p><span style={{ fontSize: '20px' }}>Ledger balance $0</span></p>
+                    <p><span style={{ fontSize: '20px' }}>Available balance ${available_balance}</span></p>
+                    <p><span style={{ fontSize: '20px' }}>Ledger balance ${ledger_balance}</span></p>
                 </div>
-                <SmallButton text='Withdraw funds' icon={faMoneyBillTransfer}/>
+                <Link className='remove-link-style' to='/withdraw-funds'>
+                    <SmallButton text='Withdraw funds' icon={faMoneyBillTransfer}/>
+                </Link>
             </div>
             <div style={{ overflowX: 'scroll', overflowY: 'auto', marginTop: '10px' }} className='order'>
                 <Header text='Bank accounts' />

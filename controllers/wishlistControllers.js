@@ -35,11 +35,14 @@ const addItemToWishlist = async (req, res) => {
         }
         // Save wishlist
         await wish.save();
+        // Return the item
+        const wishItem = wish.items.find(item => item.productid === productid);
         // Return success response
         return res.status(201).json({
             msg: 'You have successfully added this product to your wishlist for future reference. You can view your wishlist by clicking the wishlist icon on the menu.',
             status: 'created',
-            status_code: '201'
+            status_code: '201',
+            item: wishItem
         });        
     } catch (error) {
         // Return error if request fails

@@ -25,6 +25,7 @@ import Order from './screens/Order';
 import Wallet from './screens/Wallet';
 import AddBankAccount from './screens/AddBankAccount';
 import EditBankAccount from './screens/EditBankAccount';
+import Withdraw from './screens/Withdraw';
 
 const token = localStorage.getItem("token");
 if (token) {
@@ -63,6 +64,7 @@ function App() {
           <Route path="/wallet" element={<PrivateRoute><Wallet /></PrivateRoute>} />
           <Route path="/add-bank" element={<PrivateRoute><AddBankAccount /></PrivateRoute>} />
           <Route path="/edit-bank/:id" element={<PrivateRoute><EditBankAccount /></PrivateRoute>} />
+          <Route path="/withdraw-funds" element={<PrivateRoute><Withdraw /></PrivateRoute>} />
         </Routes>
       </div>
       <Footer />
