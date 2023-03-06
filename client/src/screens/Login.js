@@ -8,7 +8,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { loginUser, clearMessages } from '../reducers/authSlice';
 import FormAlert from '../components/layout/FormAlert';
 import OTPCheck from '../components/auth/OTPCheck';
-import Success from '../components/layout/Success';
 
 const Login = () => {
     const [ formData, setFormData ] = useState({
@@ -50,8 +49,6 @@ const Login = () => {
     if (isAuthenticated && localStorage.getItem("token")) return <Navigate to="/dashboard" />
 
     if (message.activation_status && message.activation_status === 'pending') return <OTPCheck loading={loading} message={message} phonenumber ={message&& message.data.phonenumber} />
-
-    if (message.status === 'activation successful') return <Success />
     
     return (
         <form onSubmit={(e) => onSubmit(e)}>
