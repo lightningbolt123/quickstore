@@ -30,7 +30,9 @@ const Wishlist = () => {
     
     return (
         <Fragment>
-            {wishlistMessage && JSON.stringify(wishlistMessage) !== '{}' ? (<FormAlert alert={wishlistMessage} />) : ''}
+            <div className='cart-alert'>
+                {wishlistMessage && JSON.stringify(wishlistMessage) !== '{}' ? (<FormAlert alert={wishlistMessage} />) : ''}
+            </div>
             <div className='cart' style={{ minHeight: '100px' }}>
                 <Header text='Wishlist' />
                 <table style={{ marginTop: '10px' }}>
