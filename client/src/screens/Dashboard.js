@@ -5,53 +5,85 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadUser } from '../reducers/authSlice';
 import { getCart } from '../reducers/cartSlice';
-import { getInvoices } from '../reducers/orderSlice';
+import { getInvoices, checkIfUserIsVendor } from '../reducers/orderSlice';
 import Header from '../components/layout/Header';
 import formatDate from '../utils/formatDate';
 
-const links = [
-    {
-        id: '1',
-        name: 'Settings',
-        path: 'settings',
-        color: '#2596be',
-        icon: faGear
-    },
-    {
-        id: '2',
-        name: 'Orders',
-        path: 'orders',
-        color: '#2596be',
-        icon: faList
-    },
-    {
-        id: '3',
-        name: 'Store',
-        path: 'store',
-        color: '#2596be',
-        icon: faStore
-    },
-    {
-        id: '4',
-        name: 'Wallet',
-        path: 'wallet',
-        color: '#2596be',
-        icon: faWallet
-    },
-    {
-        id: '5',
-        name: 'Wishlist',
-        path: 'wishlist',
-        color: '#2596be',
-        icon: faHeart
-    }
-]
-
 const Dashboard = () => {
     const { isAuthenticated, user } = useSelector((state) => state.auth);
-    const { invoices } = useSelector((state) => state.order);
+    const { invoices, isVendor } = useSelector((state) => state.order);
 
     const dispatch = useDispatch();
+
+    let links;
+
+    if (isVendor) {
+        links = [
+            {
+                id: '1',
+                name: 'Settings',
+                path: 'settings',
+                color: '#2596be',
+                icon: faGear
+            },
+            {
+                id: '2',
+                name: 'Orders',
+                path: 'orders',
+                color: '#2596be',
+                icon: faList
+            },
+            {
+                id: '3',
+                name: 'Store',
+                path: 'store',
+                color: '#2596be',
+                icon: faStore
+            },
+            {
+                id: '4',
+                name: 'Wallet',
+                path: 'wallet',
+                color: '#2596be',
+                icon: faWallet
+            },
+            {
+                id: '5',
+                name: 'Wishlist',
+                path: 'wishlist',
+                color: '#2596be',
+                icon: faHeart
+            }
+        ]
+    } else {
+        links = [
+            {
+                id: '1',
+                name: 'Settings',
+                path: 'settings',
+                color: '#2596be',
+                icon: faGear
+            },
+            {
+                id: '3',
+                name: 'Store',
+                path: 'store',
+                color: '#2596be',
+                icon: faStore
+            },
+            {
+                id: '5',
+                name: 'Wishlist',
+                path: 'wishlist',
+                color: '#2596be',
+                icon: faHeart
+            }
+        ]
+    }
+
+    useEffect(() => {
+        dispatch(checkIfUserIsVendor())
+    },[dispatch]);
 
     useEffect(() => {
         if (isAuthenticated && user === null) {

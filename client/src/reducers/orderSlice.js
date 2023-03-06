@@ -74,13 +74,26 @@ export const getOrder = createAsyncThunk(
     }
 );
 
+export const checkIfUserIsVendor = createAsyncThunk(
+    "order/heckIfUserIsVendorStatus",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await orderAPI.userIsVendor();
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
 const initialState = {
     loading: true,
     orders: [],
     invoice: {},
     invoices: [],
     message: {},
-    errors: []
+    errors: [],
+    isVendor: false
 };
 
 // Auth slice
@@ -172,6 +185,19 @@ export const orderSlice = createSlice({
             state.invoice = payload.data;
         });
         builder.addCase(getOrder.rejected, (state, { payload }) => {
+            state.loading = false;
+            state.message = payload;
+        });
+        builder.addCase(checkIfUserIsVendor.pending, (state, { payload }) => {
+            state.loading = true;
+        });
+        builder.addCase(checkIfUserIsVendor.fulfilled, (state, { payload }) => {
+            state.loading = false;
+            const { data, ...rest } = payload;
+            state.isVendor = data;
+            state.message = rest;
+        });
+        builder.addCase(checkIfUserIsVendor.rejected, (state, { payload }) => {
             state.loading = false;
             state.message = payload;
         });

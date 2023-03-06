@@ -25,7 +25,6 @@ const Navigator = () => {
     <div className='menu'>
         <h2 className='header-logo'><Link className='remove-link-style' to='/'>QuickStore</Link><FontAwesomeIcon className='navbar-icon' icon={faBars} onClick={toggleMenu} /></h2>
         <ul className={menuState? 'hamburger-menu': ''}>
-            <li>categories</li>
             {isAuthenticated ? '': (<Fragment>
                 <Link to='/login' className='remove-link-style'><li>Login</li></Link>
                 <Link to='/signup' className='remove-link-style'><li>Signup</li></Link>
@@ -34,7 +33,7 @@ const Navigator = () => {
                 <Fragment>
                     <Link to='/dashboard' className='remove-link-style'><li>Dashboard</li></Link>
                     <Link to='/cart' className='remove-link-style'><li>Cart</li></Link>
-                    <li>wishlist</li>
+                    <Link to='/wishlist' className='remove-link-style'><li>wishlist</li></Link>
                     <li style={{ cursor: 'pointer' }} onClick={logoutUser}>Logout</li>
                 </Fragment>
             ) : ''}

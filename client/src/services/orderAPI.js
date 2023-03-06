@@ -50,11 +50,20 @@ export const updateInvoiceStatus = (id, item_id, data) => {
     return axios.put(`http://localhost:5000/api/orders/${id}/${item_id}`, JSON.stringify({ newstatus: data }), headerConfig);
 }
 
+export const userIsVendor = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        setAuthToken(token);
+    }
+    return axios.get('http://localhost:5000/api/orders/userisvendor', headerConfig);
+}
+
 export const orderAPI = {
     placeOrder,
     getInvoices,
     getInvoice,
     getOrders,
     getOrder,
-    updateInvoiceStatus
+    updateInvoiceStatus,
+    userIsVendor
 }
