@@ -7,6 +7,8 @@ import { faEnvelope, faUserCircle, faLock, faArrowRightToBracket } from '@fortaw
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { loginUser, clearMessages } from '../reducers/authSlice';
 import FormAlert from '../components/layout/FormAlert';
+import OTPCheck from '../components/auth/OTPCheck';
+import Success from '../components/layout/Success';
 
 const Login = () => {
     const [ formData, setFormData ] = useState({
@@ -20,8 +22,12 @@ const Login = () => {
     const { errors, message, loading, isAuthenticated } = useSelector((state) => state.auth);
 
     useEffect(() => {
-        dispatch(clearMessages());
-    },[dispatch]);
+        if (JSON.stringify(message) !== '{}' && !message.activation_status) {
+            setTimeout(() => {
+                dispatch(clearMessages());
+            }, 3000);
+        }
+    },[dispatch, message]);
 
     const onChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -39,12 +45,13 @@ const Login = () => {
         e.preventDefault();
         const data = { email, password };
         dispatch(loginUser(data));
-        setTimeout(() => {
-            dispatch(clearMessages());
-        },3000);
     }
 
-    if (isAuthenticated) return <Navigate to="/dashboard" />
+    if (isAuthenticated && localStorage.getItem("token")) return <Navigate to="/dashboard" />
+
+    if (message.activation_status && message.activation_status === 'pending') return <OTPCheck loading={loading} message={message} phonenumber ={message&& message.data.phonenumber} />
+
+    if (message.status === 'activation successful') return <Success />
     
     return (
         <form onSubmit={(e) => onSubmit(e)}>

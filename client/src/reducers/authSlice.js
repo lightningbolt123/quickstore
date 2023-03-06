@@ -188,8 +188,13 @@ export const authSlice = createSlice({
             } else {
                 localStorage.setItem("token", payload.data);
             }
+            const token = localStorage.getItem("token");
+            if (token) {
+                state.isAuthenticated = true;
+            } else {
+                state.isAuthenticated = false;
+            }
             state.loading = false;
-            state.isAuthenticated = true;
         });
         builder.addCase(loginUser.rejected, (state, { payload }) => {
             if (payload.errors && payload.errors.length === 1) {

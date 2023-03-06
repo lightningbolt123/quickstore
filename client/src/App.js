@@ -35,9 +35,12 @@ if (token) {
 
 function App() {
   const dispatch = useDispatch();
+
   
   useEffect(() => {
-    dispatch(loadUser());
+    if (localStorage.getItem("token")) {
+      dispatch(loadUser());
+    }
   }, [dispatch]);
 
   return (

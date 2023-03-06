@@ -88,7 +88,7 @@ router.post('/', [
         // Check if user account is active and send an otp to the user's phone number if the user's account is not active
         if (user.active === false) {
             try {
-                const verification = await smsVerification(parseInt(user.countrycode), parseInt(user.phonenumber));
+                const verification = await smsVerification(user.phonenumber);
                 if (verification.status === 'pending') {
                     res.status(201).json({
                         msg: 'Your account is inactive so we sent you an otp to your phone for activating your account.',
@@ -102,10 +102,11 @@ router.post('/', [
                     });
                 }
             } catch (error) {
+                console.log(error);
                 if (error) {
                     return res.status(503).json({ errors: [
                         {
-                            msg: 'We encountered an error while trying to send you an otp. Please try again later, thank you.',
+                            msg: 'Your account is not yet active and we encountered an error while trying to send you an activation otp. Please try again later, thank you.',
                             status: 'service unavailable',
                             status_code: '503'
                         }

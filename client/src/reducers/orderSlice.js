@@ -75,7 +75,7 @@ export const getOrder = createAsyncThunk(
 );
 
 export const checkIfUserIsVendor = createAsyncThunk(
-    "order/heckIfUserIsVendorStatus",
+    "order/checkIfUserIsVendorStatus",
     async (_, { rejectWithValue }) => {
         try {
             const response = await orderAPI.userIsVendor();
