@@ -1,7 +1,6 @@
-import { useState, useEffect, Fragment } from 'react';
+import { useEffect, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/layout/Header';
-import Button from '../components/layout/Button';
 import SmallButton from '../components/layout/SmallButton';
 import { faMoneyBillTransfer, faPlus, faCancel } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

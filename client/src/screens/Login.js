@@ -7,7 +7,6 @@ import { faEnvelope, faUserCircle, faLock, faArrowRightToBracket } from '@fortaw
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { loginUser, clearMessages } from '../reducers/authSlice';
 import FormAlert from '../components/layout/FormAlert';
-import Spinner from '../components/layout/Spinner';
 
 const Login = () => {
     const [ formData, setFormData ] = useState({
@@ -44,8 +43,6 @@ const Login = () => {
             dispatch(clearMessages());
         },3000);
     }
-
-    // if (loading) return <Spinner />
 
     if (isAuthenticated) return <Navigate to="/dashboard" />
     

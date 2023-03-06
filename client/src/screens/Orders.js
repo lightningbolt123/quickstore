@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getOrders } from '../reducers/orderSlice';
@@ -6,7 +6,7 @@ import formatDate from '../utils/formatDate';
 import Header from '../components/layout/Header';
 
 const Orders = () => {
-    const { orders, message } = useSelector(state => state.order);
+    const { orders } = useSelector(state => state.order);
     const dispatch = useDispatch();
 
     useEffect(() => {

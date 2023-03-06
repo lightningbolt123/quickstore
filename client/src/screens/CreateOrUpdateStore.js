@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import InputField from '../components/layout/InputField';
 import { faShop, faGlobe, faHouse, faSign, faMapLocationDot, faCity, faEarthEurope, faUpload } from '@fortawesome/free-solid-svg-icons';
 import Button from '../components/layout/Button';
 import FormAlert from '../components/layout/FormAlert';
-import { createOrUpdateStore, fetchLoggedInUserStore, clearMessages } from '../reducers/storeSlice';
+import { createOrUpdateStore, clearMessages } from '../reducers/storeSlice';
 
 const CreateOrUpdateStore = () => {
     const [formData, setFormData ] = useState({
@@ -49,7 +48,7 @@ const CreateOrUpdateStore = () => {
                 country: store? store.country : ''
             });
         }
-    },[msg, store, navigate]);
+    },[msg, dispatch, store, navigate]);
 
     const onChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });

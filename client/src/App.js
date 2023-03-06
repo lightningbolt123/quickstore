@@ -35,12 +35,10 @@ if (token) {
 
 function App() {
   const dispatch = useDispatch();
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  
   useEffect(() => {
-    if (!isAuthenticated && token) {
-      dispatch(loadUser());
-    }
-  }, []);
+    dispatch(loadUser());
+  }, [dispatch]);
 
   return (
     <Router>

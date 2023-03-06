@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { buildCheckFunction } from "express-validator";
 import { walletAPI } from "../services/walletAPI";
 
 // Function for getting wallet balance

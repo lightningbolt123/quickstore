@@ -1,4 +1,3 @@
-import { Fragment, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import SignupForm from '../components/auth/SignupForm';
 import OTPCheck from '../components/auth/OTPCheck';

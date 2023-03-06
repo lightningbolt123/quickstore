@@ -23,7 +23,7 @@ const StoreCard = ({ store, message, loading }) => {
         if (store && store.icon) {
             setStoreIcon(store.icon.secure_url);
         }
-    },[store]);
+    },[store, dispatch, message]);
 
     const onChange = (e) => {
         const file = e.target.files[0];

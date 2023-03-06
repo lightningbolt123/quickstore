@@ -1,6 +1,6 @@
 import { Fragment, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { faHeart, faGear, faList, faStore, faWallet, faBuildingColumns } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faGear, faList, faStore, faWallet } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadUser } from '../reducers/authSlice';
@@ -8,7 +8,6 @@ import { getCart } from '../reducers/cartSlice';
 import { getInvoices } from '../reducers/orderSlice';
 import Header from '../components/layout/Header';
 import formatDate from '../utils/formatDate';
-import StoreDetailItem from '../components/layout/StoreDetailItem';
 
 const links = [
     {
@@ -49,7 +48,7 @@ const links = [
 ]
 
 const Dashboard = () => {
-    const { isAuthenticated, user, message } = useSelector((state) => state.auth);
+    const { isAuthenticated, user } = useSelector((state) => state.auth);
     const { invoices } = useSelector((state) => state.order);
 
     const dispatch = useDispatch();

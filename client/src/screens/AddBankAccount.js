@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Button from '../components/layout/Button';
 import Header from '../components/layout/Header';
 import FormAlert from '../components/layout/FormAlert';
-import { faCheck, faUser, faBank, faCreditCard, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faBank, faCreditCard, faUpload } from '@fortawesome/free-solid-svg-icons';
 import InputField from '../components/layout/InputField';
 import { useSelector, useDispatch } from 'react-redux';
 import { addBankAccount, clearBankMessages } from '../reducers/bankSlice';

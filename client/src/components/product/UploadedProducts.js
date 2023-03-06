@@ -1,20 +1,19 @@
 import { useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import SmallButton from '../layout/SmallButton';
 import Header from '../layout/Header';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTrashAlt, faEdit } from '@fortawesome/free-solid-svg-icons';
-import { getVendorProducts, deleteProductFromStore, clearProductMessages } from '../../reducers/productSlice';
+import { getVendorProducts, deleteProductFromStore } from '../../reducers/productSlice';
 
 const UploadedProducts = ({ storeId }) => {
-    const { products, msg } = useSelector((state) => state.product);
+    const { products } = useSelector((state) => state.product);
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(getVendorProducts(storeId));
-    },[]);
+    },[dispatch, storeId]);
 
     const removeProduct = (e, id) => {
         e.preventDefault();
@@ -42,7 +41,7 @@ const UploadedProducts = ({ storeId }) => {
                     {products.map(product => (
                         <tr key={product.id}>
                             <td>
-                                <img src={product.product_images[0].secure_url} style={{ width: '50px', height: '50px'}} />
+                                <img src={product.product_images[0].secure_url} style={{ width: '50px', height: '50px'}} alt='product placeholder' />
                             </td>
                             <td>{product.product_name}</td>
                             <td>{product.product_price}</td>

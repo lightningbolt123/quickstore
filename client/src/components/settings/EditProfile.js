@@ -3,7 +3,6 @@ import InputField from '../layout/InputField';
 import PhoneInputField from '../layout/PhoneInputField';
 import Button from '../layout/Button';
 import PropTypes from 'prop-types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faEnvelope, faHouse, faLocationArrow, faMap, faCity, faGlobe, faEdit, faLocationPin } from '@fortawesome/free-solid-svg-icons';
 import { updateAccount, clearMessages } from '../../reducers/authSlice';
 import { useDispatch } from 'react-redux';

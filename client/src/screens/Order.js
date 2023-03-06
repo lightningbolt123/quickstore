@@ -1,10 +1,8 @@
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '../components/layout/Header';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCancel, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getOrder, getInvoice, updateInvoice, clearOrderMessages } from '../reducers/orderSlice';
+import { getOrder, clearOrderMessages } from '../reducers/orderSlice';
 import FormAlert from '../components/layout/FormAlert';
 
 const Order = () => {

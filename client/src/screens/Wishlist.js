@@ -1,5 +1,4 @@
 import { useEffect, Fragment } from 'react';
-import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getWishlist } from '../reducers/wishlistSlice';
 import Header from '../components/layout/Header';

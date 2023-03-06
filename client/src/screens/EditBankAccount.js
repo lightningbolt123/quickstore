@@ -22,7 +22,7 @@ const EditBankAccount = () => {
 
     useEffect(() => {
         dispatch(getBankAccount(id));
-    },[]);
+    },[dispatch, id]);
 
     useEffect(() => {
         setFormData({
@@ -39,7 +39,7 @@ const EditBankAccount = () => {
                 dispatch(clearBankMessages());
             }, 5000);
         }
-    },[message]);
+    },[message, errors, dispatch]);
 
     const getError = (name) => {
         const findError = errors.filter(error => error.param === name);

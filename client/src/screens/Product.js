@@ -5,7 +5,7 @@ import { getProduct } from '../reducers/productSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faCartShopping, faChevronLeft, faChevronRight, faPlusCircle, faMinusCircle, faHeartCirclePlus, faHeartCircleMinus } from '@fortawesome/free-solid-svg-icons';
 import { addToCart, clearCartMessages } from '../reducers/cartSlice';
-import { addToWishlist, removeFromWishlist, getWishlist, clearWishlistMessage } from '../reducers/wishlistSlice';
+import { addToWishlist, removeFromWishlist, getWishlist } from '../reducers/wishlistSlice';
 import FormAlert from '../components/layout/FormAlert';
 import Spinner from '../components/layout/Spinner';
 
@@ -115,6 +115,9 @@ const Product = () => {
         <Fragment>
             <div className='cart-alert'>
                 {JSON.stringify(cartMessage) !== '{}' ? (<FormAlert alert={cartMessage} />) : ''}
+            </div>
+            <div className='cart-alert'>
+                {JSON.stringify(msg) !== '{}' ? (<FormAlert alert={msg} />) : ''}
             </div>
             <div className='product-box'>
                 <div style={{ marginLeft: '0px', marginRight: '10px' }}>

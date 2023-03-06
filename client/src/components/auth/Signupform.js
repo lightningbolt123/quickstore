@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import InputField from '../layout/InputField';
 import { faUser, faEnvelope, faLock, faHouse, faLocationArrow, faMap, faCity, faGlobe, faAddressCard, faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
 import PhoneInputField from '../layout/PhoneInputField';
@@ -31,7 +31,7 @@ const SignupForm = ({ errors, loading, message }) => {
 
     useEffect(() => {
         dispatch(clearMessages());
-    },[]);
+    },[dispatch]);
 
     const getError = (name) => {
         const findError = errors.filter(error => error.param === name);

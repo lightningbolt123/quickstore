@@ -13,7 +13,7 @@ const Cart = () => {
     const [ cardnumber, setCardnumber ] = useState('');
     const [ cvv, setCvv ] = useState('');
     const [ expirydate, setExpirydate ] = useState('');
-    const { cart, msg } = useSelector(state => state.cart);
+    const { cart } = useSelector(state => state.cart);
     const { message, errors } = useSelector(state => state.order);
     const dispatch = useDispatch();
 

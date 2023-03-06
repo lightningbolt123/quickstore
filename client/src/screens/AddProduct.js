@@ -150,7 +150,7 @@ const AddProduct = () => {
         // } else {
         //     data.images = photoImages;
         // }
-        const result = dispatch(createProduct(data));
+        dispatch(createProduct(data));
     }
 
     return (

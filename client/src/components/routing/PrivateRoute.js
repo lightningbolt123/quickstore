@@ -1,6 +1,5 @@
-import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Spinner from '../layout/Spinner';
 
 const PrivateRoute = ({ children }) => {
