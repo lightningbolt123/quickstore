@@ -15,7 +15,7 @@ export const addToWishlist = createAsyncThunk(
 );
 
 // Function for getting all items in wishlist
-const getWishlist = createAsyncThunk(
+export const getWishlist = createAsyncThunk(
     "wishlist/getWishlistStatus",
     async (_, { rejectWithValue }) => {
         try {
@@ -28,7 +28,7 @@ const getWishlist = createAsyncThunk(
 );
 
 // Function for removing item from wishlist
-const removeFromWishlist = createAsyncThunk(
+export const removeFromWishlist = createAsyncThunk(
     "wishlist/removeFromWishlistStatus",
     async (id, { rejectWithValue }) => {
         try {
@@ -97,7 +97,7 @@ export const wishlistSlice = createSlice({
             state.loading = false;
             const { id, ...rest } = payload;
             state.wishlistMessage = rest;
-            state.items = state.items.filter(item => item._id !== id);
+            state.items = state.items.filter(item => item.productid.toString() !== id.toString());
         });
         builder.addCase(removeFromWishlist.rejected, (state, { payload }) => {
             state.loading = false;

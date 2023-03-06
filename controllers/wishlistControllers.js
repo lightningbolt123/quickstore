@@ -70,6 +70,13 @@ const getWishlist = async (req, res) => {
         }
         // Then fetch wishlist
         const wishlist = await Wishlist.findOne({ owner: req.user.id });
+        if (!wishlist) {
+            return res.status(404).json({
+                msg: 'You don\'t have an item in your wishlist yet. Add one by  clicking the love sign on any product.',
+                status: 'not found',
+                status_code: '404'
+            })
+        }
         // Return wishlist
         return res.status(200).json({
             status: 'success',
@@ -77,6 +84,7 @@ const getWishlist = async (req, res) => {
             data: wishlist.items
         });
     } catch (error) {
+        console.log(error);
         // Return error if error exists
         if (error) {
             return res.status(503).json({
@@ -103,7 +111,7 @@ const removeItemFromWishlist = async (req, res) => {
         // Fetch the wishlist item
         const wishlist = await Wishlist.findOne({ owner: req.user.id });
         // Check if the item exists
-        if (wishlist.items.filter(item => item._id.toString() === req.params.id).length === 0) {
+        if (wishlist.items.filter(item => item.productid.toString() === req.params.id.toString()).length === 0) {
             return res.status(404).json({
                 msg: 'The item you are trying to delete does not exist on our database.',
                 status: 'not found',
@@ -111,18 +119,20 @@ const removeItemFromWishlist = async (req, res) => {
             });
         }
         // Create wish item removeIndex
-        const removeIndex = wishlist.items.map(item => item._id.toString()).indexOf(req.params.id);
+        const removeIndex = wishlist.items.map(item => item.productid.toString()).indexOf(req.params.id.toString());
         wishlist.items.splice(removeIndex, 1);
+        await wishlist.save();
         // Return success response
         return res.status(200).json({
             msg: 'You have successfully removed an item from your wishlist.',
             status: 'success',
             status_code: '200',
-            id
+            id: req.params.id
         });
     } catch (error) {
        // Return error if error exists
        if (error) {
+        console.log(error);
             return res.status(503).json({
                 msg: 'We are sorry we are unable to remove this item from your wishlist at the moment. Please try again later. Thank you.',
                 status: 'service unavailable',

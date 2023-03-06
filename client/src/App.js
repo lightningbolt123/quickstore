@@ -26,6 +26,7 @@ import Wallet from './screens/Wallet';
 import AddBankAccount from './screens/AddBankAccount';
 import EditBankAccount from './screens/EditBankAccount';
 import Withdraw from './screens/Withdraw';
+import Wishlist from './screens/Wishlist';
 
 const token = localStorage.getItem("token");
 if (token) {
@@ -65,6 +66,7 @@ function App() {
           <Route path="/add-bank" element={<PrivateRoute><AddBankAccount /></PrivateRoute>} />
           <Route path="/edit-bank/:id" element={<PrivateRoute><EditBankAccount /></PrivateRoute>} />
           <Route path="/withdraw-funds" element={<PrivateRoute><Withdraw /></PrivateRoute>} />
+          <Route path="/wishlist" element={<PrivateRoute><Wishlist /></PrivateRoute>} />
         </Routes>
       </div>
       <Footer />

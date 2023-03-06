@@ -3,8 +3,9 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { getProduct } from '../reducers/productSlice';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faCartShopping, faChevronLeft, faChevronRight, faPlusCircle, faMinusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCartShopping, faChevronLeft, faChevronRight, faPlusCircle, faMinusCircle, faHeartCirclePlus, faHeartCircleMinus } from '@fortawesome/free-solid-svg-icons';
 import { addToCart, clearCartMessages } from '../reducers/cartSlice';
+import { addToWishlist, removeFromWishlist, getWishlist, clearWishlistMessage } from '../reducers/wishlistSlice';
 import FormAlert from '../components/layout/FormAlert';
 import Spinner from '../components/layout/Spinner';
 
@@ -13,8 +14,10 @@ const Product = () => {
     const [ start, setStart ] = useState(0);
     const [ end, setEnd ] = useState(2);
     const [ quantity, setQuantity ] = useState(1);
+    const [ isInWishlist, setIsInWishlist ] = useState(false);
     const { id } = useParams();
     const { loading, product, msg } = useSelector((state) => state.product);
+    const { items, wishlistMessage } = useSelector((state) => state.wishlist);
     const { cartMessage } = useSelector((state) => state.cart);
     const dispatch = useDispatch();
 
@@ -25,6 +28,23 @@ const Product = () => {
             },3000);
         }
     }, [dispatch, cartMessage]);
+
+    useEffect(() => {
+        dispatch(getWishlist())
+    },[dispatch]);
+
+    useEffect(() => {
+        // if (JSON.stringify(wishlistMessage) !== '{}') {
+        //     setTimeout(() => {
+        //         dispatch(clearWishlistMessage());
+        //     },3000);
+        // }
+        if (items.filter(item => item.productid === product.id).length > 0) {
+            setIsInWishlist(true);
+        } else {
+            setIsInWishlist(false);
+        }
+    },[wishlistMessage, product, dispatch, items]);
 
     const addProductToCart = (e) => {
         e.preventDefault();
@@ -38,6 +58,20 @@ const Product = () => {
         };
         dispatch(addToCart(data));
         // console.log(data);
+    }
+
+    const addToWish = (e) => {
+        const data = {
+            productid: product.id,
+            productname: product.product_name,
+            productimage: product.product_images[0].secure_url,
+            productprice: product.new_price
+        }
+        dispatch(addToWishlist(data));
+    }
+
+    const removeFromWish = (e, id) => {
+        dispatch(removeFromWishlist(id));
     }
 
     const slideForward = (e) => {
@@ -106,6 +140,15 @@ const Product = () => {
                         </p>
                     </div>
                     <div style={{ width: '100%', textAlign: 'left', paddingBottom: '10px' }}>
+                        {isInWishlist ? (
+                            <Fragment>
+                                <FontAwesomeIcon className='clickable-icon-style' onClick={(e) => removeFromWish(e, product.id)} icon={faHeartCircleMinus} size='2x' style={{ color: '#F55050' }} /><br />
+                            </Fragment>
+                        ) : (
+                            <Fragment>
+                                <FontAwesomeIcon className='clickable-icon-style' onClick={(e) => addToWish(e)} icon={faHeartCirclePlus} size='2x' style={{ color: '#F55050' }} /><br />
+                            </Fragment>
+                        )}
                         <span>Quantity</span>
                     </div>
                     <div style={{ backgroundColor: '#e3e6e7', marginLeft: '0px', marginBottom: '10px', padding: '10px', height: '30px' }}>
