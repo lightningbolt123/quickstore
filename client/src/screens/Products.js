@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getProducts } from '../reducers/productSlice';
 import Banner from '../components/Banner';
 import ProductCard from '../components/product/ProductCard';
+import Spinner from '../components/layout/Spinner';
 
 const Product = () => {
     const dispatch = useDispatch();
@@ -10,12 +11,12 @@ const Product = () => {
     useEffect(() => {
         dispatch(getProducts());
     },[dispatch]);
-    if (loading) return <p>Loading...</p>
+    if (loading) return <Spinner />
     return (
         <Fragment>
             <Banner />
             <div className='product-list'>
-                {products.map(product => (
+                {products && products.map(product => (
                     <ProductCard key={product.id} product={product} />
                 ))}
             </div>

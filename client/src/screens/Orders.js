@@ -29,7 +29,7 @@ const Orders = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {orders.map((order, index) => (
+                    {orders && orders.map((order, index) => (
                         <tr key={order._id}>
                             <td>{index + 1}</td>
                             <td>{formatDate(order.date)}</td>

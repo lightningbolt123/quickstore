@@ -19,7 +19,7 @@ const Store = () => {
 
     if (loading) return <Spinner />;
     return (
-        <div>
+        <div className='store-container'>
             <StoreCard store={store} message={msg} loading={photoLoading} />
             <UploadedProducts storeId={ store ? store.store_id : '' } />
         </div>
