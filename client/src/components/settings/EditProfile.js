@@ -7,6 +7,7 @@ import { faUser, faEnvelope, faHouse, faLocationArrow, faMap, faCity, faGlobe, f
 import { updateAccount, clearMessages } from '../../reducers/authSlice';
 import { useDispatch } from 'react-redux';
 import FormAlert from '../layout/FormAlert';
+import Header from '../layout/Header';
 
 const EditProfile = ({ errors, loading, user, message }) => {
     const [ formData, setFormData ] = useState({
@@ -79,7 +80,7 @@ const EditProfile = ({ errors, loading, user, message }) => {
     }
     return (
         <form onSubmit={(e) => onSubmit(e)} className='dashboard-form'>
-            <h1>Edit your profile</h1>
+            <Header text='Edit your profile' />
             {JSON.stringify(message) !== '{}' ? (<FormAlert alert={message} />) : ''}
 
             <InputField type='text' label='Firstname' name='firstname' value={firstname} error={getError('firstname')} changeHandler={onChange} icon={faUser} />

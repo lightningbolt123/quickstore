@@ -2,7 +2,7 @@ import './App.css';
 import 'react-phone-number-input/style.css'
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { loadUser } from './reducers/authSlice';
 import setAuthToken from './utils/setAuthToken';
 import Products from './screens/Products';
@@ -38,10 +38,8 @@ function App() {
 
   
   useEffect(() => {
-    if (localStorage.getItem("token")) {
-      dispatch(loadUser());
-    }
-  }, [dispatch]);
+    dispatch(loadUser());
+  }, []);
 
   return (
     <Router>

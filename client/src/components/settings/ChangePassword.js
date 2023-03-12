@@ -5,6 +5,7 @@ import Button from '../layout/Button';
 import { faLock, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
 import { changePassword, clearMessages } from '../../reducers/authSlice';
+import Header from '../layout/Header';
 
 const ChangePassword = ({ loading, errors }) => {
     const [ formData, setFormData ] = useState({
@@ -48,7 +49,7 @@ const ChangePassword = ({ loading, errors }) => {
     }
     return (
         <form onSubmit={(e) => onSubmit(e)} className='dashboard-form'>
-            <h1>Change your password</h1>
+            <Header text='Change your password' />
             <PasswordInputField type='password' label='Password*' name='password' value={password} passwordError={passwordError} error={getError("password")} changeHandler={onChange} icon={faLock}/>
             <PasswordInputField type='password' label='Repeat password*' name='password2' value={password2} passwordError={passwordError} changeHandler={onChange} icon={faLock} />
             <Button text='SUBMIT' loading={loading} icon={faCheck} />

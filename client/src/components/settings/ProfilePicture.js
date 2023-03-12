@@ -5,17 +5,20 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import FormAlert from '../layout/FormAlert';
 import { photoUpload } from '../../reducers/authSlice';
-import { clearMessages } from '../../reducers/authSlice';
+import { clearMessages, loadUser } from '../../reducers/authSlice';
+import Header from '../layout/Header';
 
 const ProfilePicture = ({ user, message }) => {
     const [ picture, setPicture ] = useState('');
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (user.photo) {
+        if (user && user.photo) {
             setPicture(user.photo.secure_url ? user.photo.secure_url : '');
+        } else {
+            dispatch(loadUser());
         }
-    },[user.photo]);
+    },[user, dispatch]);
 
     const onChange = (e) => {
         const file = e.target.files[0];
@@ -37,9 +40,9 @@ const ProfilePicture = ({ user, message }) => {
     
     return (
         <form className='dashboard-form'>
-            <h1>Profile picture</h1>
+            <Header text='Profile picture' /><br />
             {JSON.stringify(message) !== '{}' ? <FormAlert alert={message} /> : ''}
-            <label htmlFor='profile-picture' style={{ marginLeft: '25%', width: '50%', marginRight: '25%'}}>
+            <label htmlFor='profile-picture' style={{ marginLeft: 'auto', marginRight: 'auto'}}>
                 {picture ? <img src={picture} style={imageStyle} alt='avatar' /> : <FontAwesomeIcon style={{ backgroundColor: 'inherit', color: '#2596be' }} size='10x' icon={faUserCircle} />}
             </label>
             <input type='file' style={{ display: 'none' }} id='profile-picture' onChange={(e) => onChange(e)} name='profile-picture' />
