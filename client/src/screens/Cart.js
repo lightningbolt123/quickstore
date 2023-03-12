@@ -125,18 +125,17 @@ const Cart = () => {
                         ))}
                     </tbody>
                 </table>
-                
-                {cart.length > 0 && (
-                    <form onSubmit={(e) => onSubmit(e)} className='cart-form'>
-                        {JSON.stringify(message) !== '{}' ? (<FormAlert alert={message} />) : ''}
-                        <Header text='Place order' />
-                        <InputField type='text' label='card number' name='cardnumber' value={cardnumber} changeHandler={cardOnchange} error={getError('cardnumber')} icon={faCreditCard} placeholder='xxxx-xxxx-xxxx-xxxx'/>
-                        <InputField type='text' label='cvv' name='cvv' value={cvv} changeHandler={cvvOnchange} error={getError('cvv')} icon={faCreditCard} placeholder='xxx'/>
-                        <InputField type='text' label='expiry date' name='expirydate' value={expirydate} changeHandler={expiryOnchange} error={getError('expirydate')} icon={faCalendar} placeholder='mm/yy'/>
-                        <Button text='SUBMIT' icon={faCheck} />
-                    </form>
-                )}
             </div>
+            {cart.length > 0 && (
+                <form onSubmit={(e) => onSubmit(e)} className='cart-form'>
+                    {JSON.stringify(message) !== '{}' ? (<FormAlert alert={message} />) : ''}
+                    <Header text='Place order' />
+                    <InputField type='text' label='card number' name='cardnumber' value={cardnumber} changeHandler={cardOnchange} error={getError('cardnumber')} icon={faCreditCard} placeholder='xxxx-xxxx-xxxx-xxxx'/>
+                    <InputField type='text' label='cvv' name='cvv' value={cvv} changeHandler={cvvOnchange} error={getError('cvv')} icon={faCreditCard} placeholder='xxx'/>
+                    <InputField type='text' label='expiry date' name='expirydate' value={expirydate} changeHandler={expiryOnchange} error={getError('expirydate')} icon={faCalendar} placeholder='mm/yy'/>
+                    <Button text='SUBMIT' icon={faCheck} />
+                </form>
+            )}
             {cart.length > 0 && <Banks />}
         </Fragment>
     )
